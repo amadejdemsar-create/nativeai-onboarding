@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent-ready orodja · zemljevid za podjetja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--lime:#BEF264;--ink:#0A0A0C;--panel:#141417;--panel2:#1b1b20;--text:#E8E8EA;--muted:#9b9ba3;--line:#2a2a31;--blue:#7dd3fc}
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scrollbar-color:#3a3a42 var(--ink)}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:#3a3a42;border-radius:8px;border:2px solid var(--ink)}
+  body{margin:0;background:var(--ink);color:var(--text);font:15.5px/1.6 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+  h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0 0 .4em}
+  h1{font-size:clamp(1.9rem,5vw,3rem)}
+  h2{font-size:clamp(1.3rem,3vw,1.7rem)}
+  p{margin:.4em 0 1em}
+  a{color:var(--lime)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+  header.hero{padding:60px 0 28px}
+  .kicker{color:var(--lime);font-family:"Space Grotesk";font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
+  .lead{color:var(--muted);max-width:700px;font-size:1.02rem}
+  .pill{display:inline-block;background:#232329;border:1px solid var(--line);border-radius:999px;padding:2px 12px;font-size:.74rem;color:var(--muted);margin:0 6px 6px 0;white-space:nowrap}
+  .pill.lime{background:var(--lime);color:var(--ink);border-color:var(--lime);font-weight:600}
+
+  .chips{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+  .chips .wrap{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font:600 .78rem "Space Grotesk";border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+
+  .legend{padding:22px 0 4px}
+  .legend .wrap{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.8rem;align-items:center}
+  .b{display:inline-block;font:600 .68rem "JetBrains Mono";border-radius:6px;padding:2px 8px;border:1px solid var(--line)}
+  .b.off{background:#26330f;color:var(--lime);border-color:#3d4a2a}
+  .b.com{background:#132733;color:var(--blue);border-color:#1d3a4a}
+  .b.no{background:#1b1b20;color:#6b7280}
+
+  section.cat{padding:26px 0 6px}
+  .ghead{margin:44px 0 0;padding:18px 0 0;border-top:2px solid var(--line)}
+  .ghead h2{font-size:clamp(1.5rem,3.4vw,2rem);margin:0}
+  .ghead p{color:var(--muted);margin:2px 0 0;font-size:.9rem}
+  .ghead:first-child{margin-top:8px;border-top:0}
+  section.cat h2 .cico{margin-right:8px}
+  .tools{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));margin:14px 0 8px}
+  .tools>*{min-width:0}
+  .tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .tool .thead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .tool h3{font-size:1.02rem;margin:0}
+  .tool .oss{font:600 .62rem "Space Grotesk";letter-spacing:.06em;text-transform:uppercase;color:var(--blue);border:1px solid #1d3a4a;border-radius:6px;padding:2px 7px;white-space:nowrap}
+  .tool .oss.sa{color:#fbbf24;border-color:#4a3a1d}
+  .score{display:flex;gap:3px;flex:0 0 auto;margin-top:4px}
+  .score i{width:9px;height:9px;border-radius:50%;background:#26262c}
+  .score i.f{background:var(--lime)}
+  .badges{display:flex;gap:6px;flex-wrap:wrap}
+  .tool .can{font-size:.82rem;color:var(--muted);margin:0;flex:1}
+  .tool .price{font-size:.76rem;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;margin:0}
+  .tool .price b{color:var(--text);font-weight:600}
+  .note{font-size:.8rem;color:var(--muted)}
+
+  .gen{margin:44px 0 0;padding:34px 0 46px;border-top:1px solid var(--line)}
+  .genbox{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+  textarea{width:100%;min-height:110px;background:#0f0f12;border:1px solid var(--line);border-radius:10px;color:var(--text);font:14px/1.6 Inter;padding:12px 14px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--lime)}
+  button.primary{font:600 .9rem "Space Grotesk";background:var(--lime);color:var(--ink);border:none;border-radius:10px;padding:12px 20px;cursor:pointer;margin-top:12px}
+  button.ghost{font:600 .85rem "Space Grotesk";background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer;margin-top:12px}
+  pre.gp{background:#0f0f12;border:1px solid #3d4a2a;border-radius:10px;padding:16px;white-space:pre-wrap;font:13px/1.65 "JetBrains Mono";color:#d6f5a3;display:none;margin-top:16px;overflow-x:auto}
+  footer{padding:40px 0;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">NativeAI · zemljevid orodij</div>
+    <h1>Katera orodja zna upravljati <span style="color:var(--lime)">tvoj AI</span>.</h1>
+    <p class="lead">Agent je uporaben toliko, kolikor orodij lahko upravlja. Ta zemljevid za vsako poslovno kategorijo pokaže orodja z uradnim API-jem, CLI-jem ali MCP-jem, oceno, koliko agentu v resnici pustijo, in ceno. Vse preverjeno na uradnih virih 17. 7. 2026.</p>
+    <p>
+      <span class="pill lime">59 orodij · 18 kategorij</span>
+      <span class="pill">8 osnovnih + 10 specifičnih sistemov</span>
+      <span class="pill">ocene 1 do 5 po agent-dostopu</span>
+    </p>
+  </div>
+</header>
+
+<nav class="chips"><div class="wrap" id="chips"></div></nav>
+
+<div class="legend">
+  <div class="wrap">
+    <span><span class="b off">uradno</span> prva liga: vzdržuje ga proizvajalec</span>
+    <span><span class="b com">skupnost</span> deluje, vzdržuje skupnost</span>
+    <span><span class="b no">ni</span> te poti ni</span>
+    <span>● ocena = koliko lahko agent res OPRAVI (5 = celotno delo, 3 = samo API, omejeno)</span>
+  </div>
+</div>
+
+<div class="wrap" id="cats"></div>
+
+<div class="gen">
+  <div class="wrap">
+    <h2>Tvoje kategorije ni na zemljevidu?</h2>
+    <p class="muted" style="max-width:660px">Opiši, kaj rabiš in katera orodja uporabljaš zdaj. Spodnji gumb ti sestavi prompt, ki ga prilepiš v svoj Claude, Codex ali Cursor, in agent zate poišče ter preveri najboljša agent-ready orodja.</p>
+    <div class="genbox">
+      <textarea id="need" placeholder="Primer: Vodim manjši hotel. Za rezervacije uporabljamo Bookalet, za račune Minimax, komuniciramo prek WhatsAppa. Rad bi, da AI pripravlja odgovore gostom in izdaja predračune."></textarea>
+      <button class="primary" onclick="genPrompt()">Generiraj prompt za svojega agenta</button>
+      <button class="ghost" id="copybtn" onclick="copyPrompt()" style="display:none">📋 Kopiraj</button>
+      <pre class="gp" id="gp"></pre>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    Vsaka trditev o MCP/API/CLI in vsaka cena ima vir z datumom v <code>research/</code> (agent-ready-tools + batch2a/2b). MCP ekosistem se premika mesečno; pred odločitvijo naj tvoj agent preveri sveže stanje (prompt zgoraj to naredi). · NativeAI · sestrska vodiča: guide.html in vodic-aplikacije.html
+  </div>
+</footer>
+
+<script>
+const B={o:'<span class="b off">uradno</span>',c:'<span class="b com">skupnost</span>',n:'<span class="b no">ni</span>'};
+const GROUPS={core:{title:'Osnovni sistemi',sub:'rabi jih skoraj vsako podjetje'},spec:{title:'Specifični sistemi',sub:'odvisno od tega, kaj podjetje počne'}};
+const CATS=[
+ {g:'core',ico:'💬',name:'Komunikacija (email, chat, video)',tools:[
+  {n:'Gmail / Google Workspace',api:'o',cli:'c',mcp:'o',can:'Branje, iskanje, osnutki, labele; pošiljanje prek API.',s:5,p:'Business Starter <b>6,80 €</b>/uporabnika/m'},
+  {n:'Outlook / Microsoft 365',api:'o',cli:'n',mcp:'o',can:'Uradni MCP samo bere; pisanje prek Graph API ali community MCP.',s:4,p:'Basic <b>7 $</b>/uporabnika/m'},
+  {n:'Slack',api:'o',cli:'n',mcp:'o',can:'Iskanje, branje in pošiljanje sporočil, kanali, canvasi.',s:5,p:'<b>0 $</b> · Pro 8,25 €/uporabnika/m'},
+  {n:'Discord',api:'o',cli:'n',mcp:'c',can:'Poln bot dostop (sporočila, kanali) prek Bot API + community MCP.',s:4,p:'<b>0 $</b> (Bot API brezplačen)'},
+  {n:'Telegram',api:'o',cli:'c',mcp:'c',can:'Sporočila, mediji, ankete, webhooki prek Bot API.',s:4,p:'<b>0 $</b> (Bot API brezplačen)'},
+  {n:'Microsoft Teams',api:'o',cli:'n',mcp:'o',can:'Uradni MCP samo bere; pošiljanje in kanali prek Graph API ali community MCP.',s:4,p:'v Microsoft 365 · Essentials ~<b>4 $</b>/uporabnika/m'},
+  {n:'Zoom',api:'o',cli:'n',mcp:'o',can:'Uradni MCP: iskanje po sestankih, posnetki, transkripti, prisotnost; ustvarjanje sestankov prek API.',s:4,p:'<b>0 $</b> Basic · Pro ~13 $/uporabnika/m letno'}]},
+ {g:'core',ico:'🗂️',name:'Projekti & taski',tools:[
+  {n:'Linear',api:'o',cli:'n',mcp:'o',can:'Issues, projekti, komentarji; narejen z mislijo na coding agente.',s:5,p:'<b>0 $</b> do 250 issues · Basic 10 $/uporabnika/m'},
+  {n:'Trello',api:'o',cli:'n',mcp:'o',can:'Table, seznami, kartice, checkliste (brisanje samo prek API).',s:5,p:'<b>0 $</b> · Standard 5 $/uporabnika/m'},
+  {n:'Asana',api:'o',cli:'n',mcp:'o',can:'Uradni MCP v2: ustvarjanje taskov, iskanje po projektih, urejanje dela, analiza obremenitve.',s:5,p:'<b>0 $</b> (do 2) · Starter 10,99 $/uporabnika/m letno'},
+  {n:'ClickUp',api:'o',cli:'n',mcp:'o',can:'Uradni MCP (~40 orodij): taski, časovniki, iskanje po Docs in komentarjih, poročila. Na Free planu limit 50 MCP klicev/dan.',s:5,p:'<b>0 $</b> · Unlimited 7 $/člana/m letno'},
+  {n:'Jira',api:'o',cli:'n',mcp:'o',can:'En Atlassian MCP z 72+ orodji pokrije Jira, Confluence in Bitbucket: iskanje, ustvarjanje, bulk urejanje issue-jev.',s:5,p:'<b>0 $</b> do 10 uporabnikov · Standard 7,91 $/uporabnika/m'},
+  {n:'Monday.com',api:'o',cli:'n',mcp:'o',can:'Uradni MCP (~20 orodij + dinamični GraphQL): boardi, itemi, lastniki, timelines, updati.',s:5,p:'<b>0 $</b> (do 2 sedeža) · Basic 9 $/sedež/m letno'}]},
+ {g:'core',ico:'📇',name:'CRM & prodaja',tools:[
+  {n:'Attio',api:'o',cli:'n',mcp:'o',can:'Zapisi, liste, opombe, taski + semantično iskanje po klicih in mailih.',s:5,p:'<b>0 €</b> · Plus 29 €/uporabnika/m'},
+  {n:'HubSpot',api:'o',cli:'o',mcp:'o',can:'Branje in pisanje: kontakti, podjetja, posli, tiketi, aktivnosti.',s:5,p:'<b>0 $</b> (do 2 uporabnika) · Starter od 20 $/sedež'},
+  {n:'Twenty',lic:'open source',api:'o',cli:'n',mcp:'o',can:'Poln CRUD čez ljudi, podjetja, taske; naš CRM teče na našem VPS.',s:5,p:'<b>self-host: strežnik</b> · cloud Pro 9 $/uporabnika/m'},
+  {n:'Pipedrive',api:'o',cli:'n',mcp:'o',can:'Uradni MCP (junij 2026, vsi plani): iskanje poslov, ustvarjanje zapisov, aktivnosti, analiza pipeline-a.',s:5,p:'Lite <b>14 $</b>/sedež/m letno'},
+  {n:'Salesforce',api:'o',cli:'o',mcp:'o',can:'Branje in pisanje zapisov, flows, Apex prek uradnega hosted MCP (od Enterprise izdaje; pravice po uporabniku).',s:5,p:'Starter <b>25 $</b>/uporabnika/m'}]},
+ {g:'core',ico:'🧾',name:'Finance & računovodstvo',tools:[
+  {n:'Stripe',api:'o',cli:'o',mcp:'o',can:'Računi, plačilni linki, stranke, plačila, refundi (23 orodij).',s:5,p:'brez mesečnine, <b>provizija na transakcijo</b> (preveri EU cenik)'},
+  {n:'Xero',api:'o',cli:'n',mcp:'o',can:'Kontakti, računi, kontni plan; branje + pisanje.',s:5,p:'Early <b>25 $</b>/m · Growing 55 $/m'},
+  {n:'QuickBooks Online',api:'o',cli:'n',mcp:'o',can:'Uradni Intuit MCP + Claude konektor: računi, stranke, dobavitelji, plačila, predračuni (CRUD).',s:5,p:'Solopreneur <b>20 $</b>/m · Simple Start 38 $/m'},
+  {n:'Odoo',lic:'open source',api:'o',cli:'n',mcp:'c',can:'Cel ERP (CRM, prodaja, zaloge, računovodstvo) prek API + community MCP. Pozor: na Odoo Online je API šele v Custom planu; self-host brez omejitev.',s:4,p:'<b>self-host: strežnik</b> · Online Standard ~24,90 $/uporabnika/m'},
+  {n:'Minimax (Seyfor)',api:'o',cli:'n',mcp:'n',can:'Slovenski računovodski standard: uradni REST API (izdani računi, stranke, artikli, zaloge), MCP-ja ni, integracija po meri.',s:3,p:'od <b>13 €</b>/m (brez DDV)'}]},
+ {g:'core',ico:'📚',name:'Dokumenti & znanje',tools:[
+  {n:'Notion',api:'o',cli:'n',mcp:'o',can:'Iskanje, branje, ustvarjanje in urejanje strani ter baz.',s:5,p:'<b>0 €</b> · Plus 9,50 €/sedež/m'},
+  {n:'Google Docs',api:'o',cli:'c',mcp:'o',can:'Ustvarjanje, branje in urejanje dokumentov prek uradnega Workspace MCP (preview); poln CRUD prek API.',s:4,p:'brezplačno z Google računom · Workspace od 6,80 €'},
+  {n:'Confluence',api:'o',cli:'n',mcp:'o',can:'Isti Atlassian MCP kot Jira: iskanje, povzemanje, ustvarjanje in urejanje strani.',s:5,p:'<b>0 $</b> do 10 · Standard 5,42 $/uporabnika/m'}]},
+ {g:'core',ico:'🗄️',name:'Shramba datotek',tools:[
+  {n:'Google Drive',api:'o',cli:'c',mcp:'o',can:'Uradni Google MCP: iskanje, branje, ustvarjanje, prenos datotek, pravice.',s:5,p:'brezplačno z Google računom · Workspace od 6,80 €'},
+  {n:'OneDrive',api:'o',cli:'n',mcp:'o',can:'Uradni MCP (preview): ustvarjanje, kopiranje, premikanje datotek; poln CRUD prek Graph API.',s:4,p:'v Microsoft 365 od <b>6 $</b>/uporabnika/m (1 TB)'},
+  {n:'Dropbox',api:'o',cli:'n',mcp:'o',can:'Uradni MCP je pretežno bralni (iskanje, branje, prenos); upload in deljenje prek API.',s:4,p:'Plus <b>9,99 $</b>/m letno (2 TB)'}]},
+ {g:'core',ico:'📊',name:'Analitika & poročanje',tools:[
+  {n:'Google Analytics 4',api:'o',cli:'c',mcp:'o',can:'Poročila, realtime, tokovi (branje, kar je bistvo analitike).',s:5,p:'<b>0 $</b>'},
+  {n:'Plausible',lic:'open source',api:'o',cli:'n',mcp:'c',can:'Statistike, časovne vrste, razčlenitve prek Stats API.',s:4,p:'<b>self-host: strežnik</b> · cloud od 9 $/m'},
+  {n:'Umami',lic:'open source',api:'o',cli:'c',mcp:'c',can:'Statistike, dogodki, realtime; upravljanje strani prek community MCP.',s:4,p:'<b>self-host: strežnik</b> · cloud 0 $ do 100k dogodkov'},
+  {n:'Power BI',api:'o',cli:'n',mcp:'o',can:'Dva uradna MCP-ja (preview): poizvedbe po modelih v naravnem jeziku + urejanje modelov (tabele, mere, DAX).',s:4,p:'Free · Pro <b>14 $</b>/uporabnika/m'},
+  {n:'Tableau',api:'o',cli:'c',mcp:'o',can:'Uradni hosted MCP: poizvedbe po governed podatkih, metrike, iskanje vsebin (bralno; dashboardov ne gradi).',s:4,p:'Viewer <b>15 $</b> · Creator 75 $/uporabnika/m letno'},
+  {n:'Looker Studio',api:'o',cli:'n',mcp:'n',can:'Pozor: uradni Google MCP je za Looker (enterprise), NE za Looker Studio; Studio API ureja samo dostope. Šibka agent pot.',s:3,p:'<b>0 $</b> (Studio)'}]},
+ {g:'core',ico:'🔗',name:'Avtomatizacije & integracije',tools:[
+  {n:'n8n',lic:'fair-code',sa:1,api:'o',cli:'n',mcp:'o',can:'Agent gradi, testira in objavlja workflow-e v tvoji instanci. Licenca: Sustainable Use (fair-code), self-host za lastno interno rabo brezplačen, ni pa OSI open source.',s:5,p:'<b>self-host: strežnik (lastna raba)</b> · cloud Starter 20 €/m'},
+  {n:'Zapier',api:'o',cli:'n',mcp:'o',can:'Sproža akcije čez 9.000+ povezanih aplikacij.',s:5,p:'<b>0 $</b> (100 taskov/m) · Pro od 19,99 $/m'},
+  {n:'Make',api:'o',cli:'n',mcp:'o',can:'Uradni cloud MCP: agent najde in požene scenarije, 3.000+ aplikacij kot klicna orodja.',s:5,p:'<b>0 $</b> (1.000 kreditov/m) · Core 9 $/m'}]},
+ {g:'spec',ico:'📣',name:'Marketing: objave & content',tools:[
+  {n:'Buffer',api:'o',cli:'n',mcp:'o',can:'Osnutki, urnik, objava, analitika čez vse kanale.',s:5,p:'<b>0 $</b> (3 kanali) · Essentials 5 $/kanal/m'},
+  {n:'Postiz',lic:'source-available · BSL',sa:1,api:'o',cli:'c',mcp:'o',can:'Poln CRUD objav na 25+ omrežij. Pozor: aprila 2026 prešel z AGPL na BSL licenco (ni več klasični open source).',s:5,p:'<b>self-host: strežnik</b> · cloud od 29 $/m'}]},
+ {g:'spec',ico:'💌',name:'Newsletterji',tools:[
+  {n:'Beehiiv',api:'o',cli:'n',mcp:'o',can:'Publikacije, naročniki, objave, segmenti, avtomatizacije.',s:5,p:'<b>0 $</b> do 2.500 naročnikov · Scale 43 $/m'},
+  {n:'Kit',api:'o',cli:'n',mcp:'o',can:'Naročniki, broadcasti, sekvence; uradni MCP je razvijalski, poln obseg prek API.',s:4,p:'<b>0 $</b> do 1.000 · Creator 33 $/m'},
+  {n:'Mailchimp',api:'o',cli:'n',mcp:'c',can:'Kampanje, avdience, poročila prek API + community MCP.',s:4,p:'<b>0 €</b> do 250 kontaktov · od 13,49 €/m'}]},
+ {g:'spec',ico:'📢',name:'Oglasi (ads)',tools:[
+  {n:'Meta Ads',api:'o',cli:'n',mcp:'o',can:'Uradni MCP (29 orodij): ustvarjanje kampanj, insights, benchmarki; prijava kar prek Business Managerja.',s:5,p:'API brezplačen, <b>plačaš oglase</b>'},
+  {n:'Google Ads',api:'o',cli:'n',mcp:'o',can:'Uradni MCP je STROGO bralni (poročila, metrike, GAQL); spremembe kampanj samo prek API.',s:4,p:'API brezplačen, <b>plačaš oglase</b>'}]},
+ {g:'spec',ico:'🎧',name:'Podpora strankam',tools:[
+  {n:'Chatwoot',lic:'open source',api:'o',cli:'n',mcp:'o',can:'Pogovori, kontakti, sporočila, inboxi, labele od začetka do konca.',s:5,p:'<b>self-host: strežnik</b> · cloud 0 $, Startups 19 $/agenta/m'},
+  {n:'Intercom',api:'o',cli:'n',mcp:'o',can:'Uradni MCP večinoma bere; odgovori in tiketi prek API.',s:4,p:'Essential od <b>29 $</b>/sedež/m'},
+  {n:'Zendesk',api:'o',cli:'n',mcp:'n',can:'Uradnega MCP ni; poln dostop samo prek REST API.',s:3,p:'Suite Team <b>55 $</b>/agenta/m'}]},
+ {g:'spec',ico:'👥',name:'HR & payroll',tools:[
+  {n:'BambooHR',api:'o',cli:'n',mcp:'c',can:'Kadrovske evidence, dopusti, payroll podatki prek API + community MCP.',s:4,p:'po ponudbi · objavljeno od ~<b>10 $</b>/zaposlenega/m'},
+  {n:'Personio',api:'o',cli:'n',mcp:'c',can:'EU kadrovski sistem: zaposleni, prisotnost, odsotnosti prek API + community MCP.',s:4,p:'po ponudbi (cene niso javne)'}]},
+ {g:'spec',ico:'🛒',name:'E-commerce',tools:[
+  {n:'Shopify',api:'o',cli:'o',mcp:'o',can:'Gradnja tem/aplikacij prek Dev MCP; artikli in naročila prek Admin API.',s:5,p:'Basic <b>19 €</b>/m letno'},
+  {n:'WooCommerce',lic:'open source',api:'o',cli:'o',mcp:'o',can:'Artikli, naročila, stranke, poročila; MCP prihaja v jedro (beta).',s:5,p:'<b>brezplačen plugin</b> (WordPress hosting)'}]},
+ {g:'spec',ico:'📦',name:'Zaloge & logistika',tools:[
+  {n:'ERPNext',lic:'open source',api:'o',cli:'o',mcp:'c',can:'Cel ERP (zaloge, nabava, prodaja, računovodstvo) prek Frappe API + zreli community MCP-ji (do 120 orodij).',s:4,p:'<b>self-host: strežnik</b> · Frappe Cloud od 5 do 10 $/m'},
+  {n:'inFlow Inventory',api:'o',cli:'n',mcp:'n',can:'Artikli, zaloge, naročila prek API (plačljiv dodatek); MCP-ja ni.',s:3,p:'od <b>110 $</b>/m + API dodatek 29 do 69 $/m'}]},
+ {g:'spec',ico:'📅',name:'Rezervacije & termini',tools:[
+  {n:'Google Calendar',api:'o',cli:'n',mcp:'o',can:'Pregled, razpoložljivost, predlogi terminov, ustvarjanje dogodkov.',s:5,p:'<b>0 $</b> z Google računom'},
+  {n:'Cal.com / Cal.diy',lic:'open source = Cal.diy',api:'o',cli:'c',mcp:'o',can:'Rezervacije, tipi dogodkov, urniki, webhooki od začetka do konca. Cal.com sam je od aprila 2026 zaprtokoden; odprtokodna self-host različica živi kot Cal.diy (MIT).',s:5,p:'<b>self-host: Cal.diy (strežnik)</b> · Cal.com cloud 0 $, Teams 12 $/uporabnika/m'}]},
+ {g:'spec',ico:'🛠️',name:'Razvoj produkta',tools:[
+  {n:'GitHub',api:'o',cli:'o',mcp:'o',can:'Uradni MCP + gh CLI: koda, issues, PR-ji, Actions, releases, varnostna opozorila; polno branje in pisanje. Za planiranje glej še Linear (Projekti & taski).',s:5,p:'<b>0 $</b> · Team 4 $/uporabnika/m'}]},
+ {g:'spec',ico:'🎨',name:'Dizajn',tools:[
+  {n:'Canva',api:'o',cli:'n',mcp:'o',can:'Ustvarjanje dizajnov, brand predloge, izvoz v PDF/sliko/video.',s:5,p:'<b>0 $</b> · Pro ~12 $/m'},
+  {n:'Figma',api:'o',cli:'n',mcp:'o',can:'Vleče design kontekst v IDE in ustvarja nazaj na canvas.',s:5,p:'<b>0 $</b> omejeno · Pro sedež 16 $/m'}]}
+];
+
+const chips=document.getElementById('chips'),cats=document.getElementById('cats');
+const allChip=document.createElement('button');allChip.className='chip on';allChip.textContent='Vse';allChip.onclick=()=>filt(-1,allChip);chips.appendChild(allChip);
+let lastG=null;
+CATS.forEach((c,i)=>{const b=document.createElement('button');b.className='chip';b.textContent=c.ico+' '+c.name;b.onclick=()=>filt(i,b);chips.appendChild(b);
+  if(c.g!==lastG){lastG=c.g;const gh=document.createElement('div');gh.className='ghead';gh.dataset.g=c.g;gh.innerHTML='<h2>'+GROUPS[c.g].title+'</h2><p>'+GROUPS[c.g].sub+'</p>';cats.appendChild(gh);}
+  const s=document.createElement('section');s.className='cat';s.id='cat'+i;s.dataset.g=c.g;
+  s.innerHTML='<h2><span class="cico">'+c.ico+'</span>'+c.name+'</h2><div class="tools">'+c.tools.map(t=>
+   '<div class="tool"><div class="thead"><h3>'+t.n+(t.lic?' <span class="oss'+(t.sa?' sa':'')+'">'+t.lic+'</span>':'')+'</h3><span class="score">'+[1,2,3,4,5].map(k=>'<i class="'+(k<=t.s?'f':'')+'"></i>').join('')+'</span></div>'+
+   '<div class="badges">API '+B[t.api]+' &nbsp;CLI '+B[t.cli]+' &nbsp;MCP '+B[t.mcp]+'</div>'+
+   '<p class="can">'+t.can+'</p><p class="price">'+t.p+'</p></div>').join('')+'</div>';
+  cats.appendChild(s);});
+function filt(i,btn){[...chips.children].forEach(b=>b.classList.toggle('on',b===btn));const secs=[...cats.querySelectorAll('section.cat')];secs.forEach((s,j)=>s.style.display=(i===-1||i===j)?'':'none');[...cats.querySelectorAll('.ghead')].forEach(g=>g.style.display=(i===-1)?'':'none');if(i>-1)window.scrollTo(0,0)}
+
+function genPrompt(){
+  const need=document.getElementById('need').value.trim();
+  const gp=document.getElementById('gp');
+  const txt=`Sem lastnik/vodja manjšega podjetja in postavljam AI agenta (Claude Code / Codex / Cursor), ki bo upravljal moja orodja. Moja situacija:
+
+${need||'<opiši, kaj rabiš in katera orodja uporabljaš zdaj>'}
+
+Tvoja naloga:
+1. Za vsako mojo potrebo preveri, ali orodje, ki ga že uporabljam, ponuja uradni API, CLI ali MCP strežnik (preveri na uradni dokumentaciji, ne iz spomina; MCP ekosistem se hitro spreminja).
+2. Če moje orodje agentu ne da dostopa ali je dostop omejen, poišči 2 do 3 alternative, ki ga imajo: vsaj eno open source (ki jo lahko poganjam na svojem strežniku) in eno upravljano/plačljivo.
+3. Za vsako orodje navedi: katere poti ima (API/CLI/MCP, uradno ali skupnostno), kaj lahko agent prek njih v resnici OPRAVI (samo branje ali tudi pisanje/objavljanje), in aktualno ceno z uradne strani cenika.
+4. Vsako trditev opremi z virom (URL) in datumom, ko si ga preveril. Če česa ne moreš preveriti, to jasno označi.
+5. Na koncu priporoči konkreten nabor orodij zame, z enim stavkom razloga na orodje, in oceni skupni mesečni strošek.
+
+Odgovori v slovenščini, pregledno, s tabelo za primerjavo.`;
+  gp.textContent=txt;gp.style.display='block';document.getElementById('copybtn').style.display='inline-block';
+}
+function copyPrompt(){navigator.clipboard.writeText(document.getElementById('gp').textContent).then(()=>{const b=document.getElementById('copybtn');b.textContent='✓ Kopirano';setTimeout(()=>b.textContent='📋 Kopiraj',1500)})}
+</script>
+</body>
+</html>

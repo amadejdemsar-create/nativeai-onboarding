@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NativeAI Onboarding Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lime:#BEF264; --ink:#0A0A0C; --panel:#141417; --panel2:#1b1b20;
+    --text:#E8E8EA; --muted:#9b9ba3; --line:#2a2a31; --warn:#fca5a5;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth; scrollbar-color:#3a3a42 var(--ink)}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:#3a3a42;border-radius:8px;border:2px solid var(--ink)}
+  ::-webkit-scrollbar-thumb:hover{background:#4a4a55}
+  body{margin:0;background:var(--ink);color:var(--text);font:16px/1.65 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+  h1,h2,h3,h4{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0 0 .5em}
+  h1{font-size:clamp(2rem,5vw,3.2rem)}
+  h2{font-size:clamp(1.5rem,3.5vw,2.1rem);margin-top:0}
+  h3{font-size:1.15rem;color:var(--lime)}
+  p{margin:.4em 0 1em}
+  a{color:var(--lime)}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{color:var(--lime);font-family:"Space Grotesk";font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem}
+  .lead{color:var(--muted);max-width:640px;font-size:1.05rem}
+  nav.toc{position:sticky;top:0;background:rgba(10,10,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+  nav.toc .wrap{display:flex;gap:4px 18px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+  nav.toc a{color:var(--muted);text-decoration:none;font-size:.85rem;white-space:nowrap}
+  nav.toc a:hover{color:var(--lime)}
+  section{padding:56px 0;border-bottom:1px solid var(--line)}
+  .num{color:var(--lime);font-family:"JetBrains Mono";font-size:.85rem}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+  .card h3{margin-top:0}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+  .grid>*{min-width:0}
+  pre{background:#0f0f12;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre;font:13px/1.6 "JetBrains Mono",monospace;color:#d6f5a3}
+  code{font-family:"JetBrains Mono",monospace;font-size:.9em;background:#1e1e24;padding:.1em .35em;border-radius:5px}
+  pre code{background:none;padding:0}
+  .pill{display:inline-block;background:#232329;border:1px solid var(--line);border-radius:999px;padding:2px 12px;font-size:.75rem;color:var(--muted);margin-right:6px;white-space:nowrap}
+  .pill.lime{background:var(--lime);color:var(--ink);border-color:var(--lime);font-weight:600}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps>li{position:relative;padding:0 0 26px 56px;counter-increment:s}
+  .steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;background:var(--lime);color:var(--ink);font:700 1rem "Space Grotesk";display:flex;align-items:center;justify-content:center}
+  .steps>li:not(:last-child)::after{content:"";position:absolute;left:17px;top:40px;bottom:4px;width:2px;background:var(--line)}
+  .steps b{font-family:"Space Grotesk"}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--lime);font-family:"Space Grotesk";font-weight:500}
+  .tablewrap{overflow-x:auto}
+  .callout{border-left:3px solid var(--lime);background:var(--panel2);padding:14px 18px;border-radius:0 10px 10px 0;margin:18px 0}
+  .callout.red{border-color:var(--warn)}
+  .callout.red b{color:var(--warn)}
+  .muted{color:var(--muted)}
+  .capability{display:block;position:relative;padding-left:1.5em;margin:6px 0}
+  .capability::before{content:"→";color:var(--lime);position:absolute;left:0;top:0}
+  footer{padding:48px 0;color:var(--muted);font-size:.85rem}
+  .ex-prompt{position:relative}
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:"Space Grotesk";font-size:.9rem;margin:14px 0}
+  .flow .node{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;white-space:nowrap}
+  .flow .node.you{border-color:var(--lime);color:var(--lime)}
+  .flow .arr{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">NativeAI · internal</div>
+    <h1>Working with your <span style="color:var(--lime)">AI&nbsp;coworker</span></h1>
+    <p class="lead">The reference guide for how we work at NativeAI. Everything from the onboarding session, written down: setup, connections, the method, and the first exercises. Read it once, then come back whenever you need a command or a step.</p>
+    <p><span class="pill lime">v1 · 16. 7. 2026</span> <span class="pill">for Andraž &amp; Leon</span> <span class="pill">graduates into the client toolkit</span></p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#mindset">0 · Mindset</a>
+    <a href="#setup">1 · Day-one setup</a>
+    <a href="#connections">2 · Connections</a>
+    <a href="#anatomy">3 · Anatomy</a>
+    <a href="#webapp">4 · Web app 101</a>
+    <a href="#method">5 · The method</a>
+    <a href="#exercises">6 · Exercises</a>
+    <a href="#rules">7 · Rules of the road</a>
+  </div>
+</nav>
+
+<section id="mindset">
+  <div class="wrap">
+    <div class="num">00</div>
+    <h2>Mindset: it's a hire, not an app</h2>
+    <p>Five sentences that carry everything else in this guide:</p>
+    <div class="card">
+      <div class="capability"><b>You don't download it, you onboard it.</b>&nbsp;Like any new coworker it needs access, instructions, context, and a review period.</div>
+      <div class="capability"><b>Everyone has the same models.</b>&nbsp;The constraint is not the AI, it is the written context you give it. The best documented company wins.</div>
+      <div class="capability"><b>It starts powerless.</b>&nbsp;It can only touch what you deliberately connect. You grant reach, door by door.</div>
+      <div class="capability"><b>You move from doing to directing.</b>&nbsp;Set intent, review output, hold the send button. Production is its job; judgment and accountability stay yours.</div>
+      <div class="capability"><b>Everything you learn here is also the product.</b>&nbsp;We work this way, then we sell this way of working. Your skill is our inventory.</div>
+    </div>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="wrap">
+    <div class="num">01</div>
+    <h2>Day-one setup</h2>
+    <ol class="steps">
+      <li><b>Create a Claude account and pick a plan.</b><br>
+        Start on <b>Pro ($20/mo)</b>, it includes Claude Code. If you hit usage limits in your first weeks (you will know), upgrade to Max 5x ($100). Prices verified 16.&nbsp;7.&nbsp;2026 at claude.com/pricing.</li>
+      <li><b>Install the Claude Code desktop app</b> (Mac). No terminal needed to start; the desktop app is the same full tool with a friendlier face. Download from claude.com/code.</li>
+      <li><b>Install the GitHub CLI and sign in.</b> All our code and documents flow through git.
+        <pre>brew install gh
+gh auth login</pre></li>
+      <li><b>Install your starter CLAUDE.md.</b> This is your AI's employee handbook, read at the start of every session. Copy <code>starter-CLAUDE.md</code> from this folder to <code>~/.claude/CLAUDE.md</code>, then fill in the three sections at the bottom (About me, My business context, My tools). Growing that context section weekly is the single highest-leverage habit in this guide.</li>
+      <li><b>Join the NativeAI Discord</b> and say hi to the bot. The team's AI reads and posts there too.</li>
+      <li><b>Get your NativeAI OS token from Amadej</b> and connect it (next chapter, first row). Tasks live there; every piece of work starts and ends as a task.</li>
+    </ol>
+
+    <div class="card ex-prompt" style="border-color:#3d4a2a">
+      <h3>⚡ Ali pa: naj vse zgoraj naredi Claude. Master setup prompt</h3>
+      <p class="muted">Namesti samo Claude Code desktop app in se prijavi. Potem odpri Claude Code in prilepi tale prompt: sam preveri okolje, namesti orodja, doda vse priklope in ti na koncu poroča, kaj deluje. Kjer piše, da rabi podatek od Amadeja, ga vprašaj po Discordu.</p>
+      <pre>Si moj AI sodelavec pri NativeAI in tole je najin prvi zagon. Postavi mi
+celoten setup, korak za korakom; po vsakem koraku preveri, da res deluje,
+in šele nato nadaljuj. Ničesar si ne izmišljuj: če rabiš podatek, ki ga
+nimaš (token, URL, ključ), se ustavi in mi povej, koga naj vprašam.
+
+1. OKOLJE: preveri, da obstajajo brew, git, node in gh. Kar manjka,
+   namesti (brew install gh ...). Za gh me vodi skozi »gh auth login«.
+
+2. HANDBOOK: ustvari ~/.claude/CLAUDE.md iz NativeAI starter predloge.
+   Predlogo prenesi z: https://amadejdemsar-create.github.io/nativeai-onboarding/starter-CLAUDE.md
+   Nato me na kratko intervjuvaj (eno vprašanje naenkrat) in izpolni
+   tri prazne sekcije na dnu: About me, My business context, My tools.
+
+3. PRIKLOPI (MCP). Dodaj in za vsakega preveri, da javi svoja orodja:
+   claude mcp add playwright -- npx @playwright/mcp@latest
+   claude mcp add context7 https://mcp.context7.com/mcp -t http
+   claude mcp add nativeai-os https://os.nativeai.agency/api/mcp/mcp -t http
+     (rabi moj osebni token: ustavi se in mi povej, naj ga dobim od Amadeja)
+   claude mcp add dokploy-personal -e DOKPLOY_URL=&lt;url&gt; -e DOKPLOY_API_KEY=&lt;key&gt; -- npx -y @ahdev/dokploy-mcp
+     (URL in ključ dobim od Amadeja; dokler ju nimam, ta korak preskoči in zabeleži)
+   Twenty CRM in ostalo dodava kasneje, ko bo delo to zahtevalo.
+
+4. RESTART: opozori me, da moram Claude Code po dodajanju MCP-jev
+   ponovno zagnati, da se priklopi primejo.
+
+5. POROČILO: na koncu mi izpiši tabelo: priklop | status (deluje /
+   čaka na token / preskočeno) | kaj mi omogoča. Plus seznam stvari,
+   ki jih moram še sam urediti (tokeni, Discord).
+
+Ko je vse zeleno, mi predlagaj, da začneva z vajo 1 iz onboarding guida.</pre>
+      <p class="muted" style="margin-top:10px"><b style="color:var(--text)">Amadej pripravi vnaprej:</b> osebni NativeAI OS token za vsakega, Dokploy URL + API ključ (skupni projekt), Discord invite.</p>
+    </div>
+  </div>
+</section>
+
+<section id="connections">
+  <div class="wrap">
+    <div class="num">02</div>
+    <h2>Connections: opening doors, one by one</h2>
+    <p class="muted">Each connection is a door you open. The command connects it; the list under it is what your AI can do once inside. Run commands in Claude Code's terminal or ask Claude itself to run them.</p>
+
+    <div class="card">
+      <h3>NativeAI OS <span class="pill">team tasks</span> <span class="pill lime">day one</span></h3>
+      <pre>claude mcp add nativeai-os https://os.nativeai.agency/api/mcp/mcp -t http</pre>
+      <p class="muted">Auth: your personal token, ask Amadej. Full setup doc: <code>nativeai-os/docs/os-mcp-setup.md</code>.</p>
+      <div class="capability">sees your open tasks at session start, creates tasks for new work, closes them with a note when shipped</div>
+      <div class="capability">keeps the whole team's who-does-what honest without meetings</div>
+    </div>
+
+    <div class="card">
+      <h3>Playwright <span class="pill">browser</span> <span class="pill lime">day one</span></h3>
+      <pre>claude mcp add playwright -- npx @playwright/mcp@latest</pre>
+      <div class="capability">opens and reads any website, fills forms, clicks through flows</div>
+      <div class="capability">takes screenshots of pages we build, at desktop and phone sizes, so it can check its own work</div>
+      <div class="capability">is the workaround door for any tool that has no direct connection</div>
+    </div>
+
+    <div class="card">
+      <h3>Dokploy <span class="pill">deploy</span> <span class="pill lime">day one</span></h3>
+      <pre>claude mcp add dokploy-personal \
+  -e DOKPLOY_URL=&lt;url&gt; -e DOKPLOY_API_KEY=&lt;key&gt; \
+  -- npx -y @ahdev/dokploy-mcp</pre>
+      <p class="muted">URL + key from Amadej (shared team project to start, least privilege).</p>
+      <div class="capability">pushes what we build onto our server: a page goes from "done on my machine" to a live URL</div>
+      <div class="capability">checks deploy status and logs when something misbehaves</div>
+    </div>
+
+    <div class="card">
+      <h3>Context7 <span class="pill">docs</span> <span class="pill lime">day one</span></h3>
+      <pre>claude mcp add context7 https://mcp.context7.com/mcp -t http</pre>
+      <div class="capability">fetches current, version-correct documentation for any library or tool while coding, instead of guessing from stale training data</div>
+    </div>
+
+    <div class="card">
+      <h3>Google Workspace (gws) <span class="pill">email · calendar</span> <span class="pill">week one</span></h3>
+      <p class="muted">A command-line door into your own Gmail, Calendar, and Drive. Needs a one-time OAuth setup, do it together with Amadej.</p>
+      <div class="capability">triages your inbox and drafts replies (drafts only, you press send)</div>
+      <div class="capability">reads your week and proposes a schedule, books after your nod</div>
+    </div>
+
+    <div class="card">
+      <h3>Twenty CRM <span class="pill">sales</span> <span class="pill">when doing GTM</span></h3>
+      <pre>claude mcp add twenty https://crm.nativeai.agency/mcp -t http</pre>
+      <div class="capability">logs leads and companies, drafts follow-ups, keeps records honest after every call</div>
+    </div>
+
+    <div class="card">
+      <h3>Codex · image generation <span class="pill">visuals</span> <span class="pill">when doing content</span></h3>
+      <p class="muted">Install the Codex desktop app and sign in with your ChatGPT account; image generation is built in. In our setup the front door is the <code>image-director</code> skill (Amadej's machine renders through it), but you can generate directly in the Codex app too. One rule: always request high quality, the default medium setting looks cheap.</p>
+      <div class="capability">generates brand visuals, post images, deck illustrations, and real-looking mockups from a description</div>
+      <div class="capability">holds a consistent style across a set via reference images</div>
+      <div class="capability">every image in the onboarding deck was made this way</div>
+    </div>
+
+    <div class="callout">
+      <b>What about research and scraping?</b> Built-in web search plus Playwright cover it at zero cost. If volume ever justifies a dedicated scraping subscription, NativeAI buys its own, we never use tools licensed to other companies.
+    </div>
+  </div>
+</section>
+
+<section id="anatomy">
+  <div class="wrap">
+    <div class="num">03</div>
+    <h2>Anatomy of Claude Code</h2>
+    <p class="muted">Seven concepts, one metaphor family. This is the whole customization system.</p>
+    <div class="grid">
+      <div class="card"><h3>The desk</h3><p><b>Context window.</b> Everything the AI is currently working with sits on one desk. A cluttered desk degrades the work, for AI exactly as for people. Most of the concepts below exist to keep the desk clean.</p></div>
+      <div class="card"><h3>The handbook</h3><p><b>CLAUDE.md.</b> Read at the start of every session, automatically. Your rules, your context, your preferences. Whatever you find yourself re-explaining, write it in here once and never again.</p></div>
+      <div class="card"><h3>Playbooks</h3><p><b>Skills.</b> A checklist that slots onto the current desk and shapes how this specific task is done, together with you. Example: an invoice skill that knows our numbering and template. Invoked with <code>/name</code>.</p></div>
+      <div class="card"><h3>Side desks</h3><p><b>Agents and subagents.</b> A coworker with their own desk. You hand off a messy pile (read these 40 pages, research this niche), the mess stays on their desk, one clean summary card comes back to yours.</p></div>
+      <div class="card"><h3>Tripwires</h3><p><b>Hooks.</b> House rules the building enforces, not politeness the worker must remember. A hook physically blocks an action (say, a destructive command) no matter what anyone asks. Guardrails that hold at 3 a.m.</p></div>
+      <div class="card"><h3>Moving boxes</h3><p><b>Plugins.</b> Handbook + playbooks + rules packed into one box that installs in one step. How a whole setup moves to a new person, or to a client.</p></div>
+      <div class="card"><h3>USB ports</h3><p><b>MCP.</b> The standard plug that connects tools to the AI. Everything in the Connections chapter goes through one. New purchasing question for any software: does it have a plug?</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="webapp">
+  <div class="wrap">
+    <div class="num">04</div>
+    <h2>Web app 101: what you're actually building</h2>
+    <p class="muted">You will build and ship web applications with Claude Code without being career programmers. For that you need the map, not the syntax. Here is the whole map.</p>
+
+    <div class="card">
+      <h3>Every web app has three layers</h3>
+      <p>Think of a restaurant:</p>
+      <div class="capability"><b>Frontend</b> is the dining room: everything the user sees and touches (pages, buttons, forms). Built from HTML, CSS and JavaScript.</div>
+      <div class="capability"><b>Backend</b> is the kitchen: the logic that runs when something is clicked. It checks, calculates, decides what's allowed. The user never sees it.</div>
+      <div class="capability"><b>Database</b> is the pantry and the ledger: the app's memory. Data written here survives after the page is closed. Tables of rows, like a spreadsheet with rules.</div>
+      <p class="muted" style="margin-top:10px">One click on "Book appointment" travels: frontend → backend (is the slot free? is the user logged in?) → database (write the booking) → back with "Booked ✓". Under a second, every time.</p>
+    </div>
+
+    <div class="card">
+      <h3>Services: the parts you plug in, not build</h3>
+      <p>Real apps almost never do everything themselves. For standard needs you connect a service with an API key and move on:</p>
+      <div class="capability"><b>Sending email</b> (confirmations, notifications): Resend or AWS SES. The app says "send this", the service handles deliverability.</div>
+      <div class="capability"><b>Users and login (auth)</b>: registration, passwords, sessions. Never invent your own; use a proven library or service (we use Better Auth in one of our stacks).</div>
+      <div class="capability"><b>Payments</b>: Stripe. The app receives a "paid" signal; cards, subscriptions and regulation are Stripe's problem.</div>
+      <div class="capability"><b>File storage</b>: uploads and images go to object storage (S3-style), not a folder on the server.</div>
+      <div class="capability"><b>Analytics</b>: who visits, from where, what they click.</div>
+    </div>
+
+    <div class="card">
+      <h3>Open source: run it on your own server</h3>
+      <p>For many paid tools there is an open source equivalent you can self-host on a VPS: your data, no monthly fee, full control, and (increasingly important) an MCP plug so your AI can operate it. Our live example: <b>Twenty CRM</b> runs on our own server instead of a paid CRM subscription, and Claude manages records in it through MCP. Same pattern exists for analytics (Umami, Plausible), storage (MinIO), auth (Keycloak). The trade-off is honest: you own the uptime. For email and payments, stick with services.</p>
+    </div>
+
+    <div class="card">
+      <h3>What this means for you two</h3>
+      <p>Claude Code writes and wires all of it: frontend, backend, database, service connections, deploy. Your job is the part it cannot do: know WHAT you want (spec), decide trade-offs when asked, and verify the result actually works. The vocabulary above is so you can read its plans and call nonsense when you see it. That plus the method chapter is the whole "learning to program" you need to start shipping; depth comes from reps, not courses.</p>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <div class="num">05</div>
+    <h2>The method, on one worked example</h2>
+    <p>How we build anything, shown on a website. The same loop applies to a document, a campaign, or an analysis.</p>
+    <div class="flow">
+      <span class="node">steal</span><span class="arr">→</span>
+      <span class="node you">get grilled</span><span class="arr">→</span>
+      <span class="node you">plan on a board</span><span class="arr">→</span>
+      <span class="node">prototype</span><span class="arr">→</span>
+      <span class="node">build</span><span class="arr">→</span>
+      <span class="node">verify</span><span class="arr">→</span>
+      <span class="node">ship</span><span class="arr">→</span>
+      <span class="node you">recap</span>
+    </div>
+    <ol class="steps">
+      <li><b>Steal like a pro.</b> Never start from a blank page. Have the AI collect the best sites in the niche (web search + Playwright screenshots) and pull from our swipe file. Taste is choosing well, not inventing from zero.</li>
+      <li><b>Get grilled.</b> Run <code>/grill-me</code>. The AI interviews YOU, one question at a time, each with its recommended answer, until the spec has no holes. The AI asking questions is a feature; assumptions are how projects die.</li>
+      <li><b>Plan visually.</b> Run <code>/visual-plan</code>. The plan renders as an interactive board in your browser (Lavish): options, tradeoffs, open questions. You approve by clicking, not by reading a wall of text. Nothing gets built before the board is approved.</li>
+      <li><b>Prototype before building.</b> The AI produces HTML design concepts with real content. You react to screens, it iterates, you lock one. <b>The locked design is binding</b>: the build must match it, every visible button must work.</li>
+      <li><b>Build.</b> Now, and only now, the production work happens. Big messy subtasks go to side desks; your main session stays clean and directs.</li>
+      <li><b>Verify before "done".</b> Playwright screenshots at desktop and phone width, compared against the locked design; every control clicked. "The tool said success" is not done. Looking at the output is done.</li>
+      <li><b>Ship.</b> Commit, push, Dokploy deploys, live URL lands in Discord.</li>
+      <li><b>Recap and close.</b> <code>/visual-recap</code> renders what changed for review, the task is closed in NativeAI OS with a one-line note, and anything you had to explain twice gets written into CLAUDE.md so next time you explain it zero times.</li>
+    </ol>
+    <div class="callout">
+      <b>The five habits behind the example:</b> write context down · plan before building · delegate mess to side desks · verify before done · get a second opinion (Codex) on expensive decisions.
+    </div>
+  </div>
+</section>
+
+<section id="exercises">
+  <div class="wrap">
+    <div class="num">06</div>
+    <h2>First exercises: see it work</h2>
+    <p class="muted">Do these in order, in your first week. The first five take minutes each and teach one load-bearing idea; the sixth is the final assignment. Paste each prompt as written.</p>
+
+    <div class="card ex-prompt">
+      <h3>1 · Tame a folder <span class="pill">read → plan → approve → execute</span></h3>
+      <pre>Look at my Downloads folder. Propose an organization plan
+(what groups, what gets archived, what looks like junk).
+Show me the plan first; only execute after I approve.</pre>
+      <p class="muted">Lesson: the AI reads real state, proposes, waits for your approval, then acts. The loop you'll use everywhere.</p>
+    </div>
+
+    <div class="card ex-prompt">
+      <h3>2 · Research with receipts <span class="pill">web-check culture</span></h3>
+      <pre>Research the top 5 tools for &lt;topic you know well&gt;.
+For every factual claim give the source link and the date
+you fetched it, and state your confidence. No claims from memory.</pre>
+      <p class="muted">Lesson: verified claims with sources, the difference between our output and AI slop. Judge it against your own knowledge of the topic.</p>
+    </div>
+
+    <div class="card ex-prompt">
+      <h3>3 · Plan on a board <span class="pill">/grill-me + /visual-plan</span></h3>
+      <pre>I want to plan &lt;something real you actually want to do&gt;.
+First /grill-me until you understand it fully,
+then /visual-plan so I can review it as a board.</pre>
+      <p class="muted">Lesson: watch it extract context out of your head and turn it into decisions you click through.</p>
+    </div>
+
+    <div class="card ex-prompt">
+      <h3>4 · A side desk <span class="pill">context hygiene</span></h3>
+      <pre>Here is a long document / folder: &lt;path&gt;.
+Send a subagent to read all of it and bring me back
+a one-page brief with the 5 things that matter. </pre>
+      <p class="muted">Lesson: the mess stays on the side desk, your session stays sharp. This is why long work doesn't degrade.</p>
+    </div>
+
+    <div class="card ex-prompt">
+      <h3>5 · Ship something <span class="pill">the full loop</span></h3>
+      <pre>Build me a one-page site about &lt;anything&gt;.
+Prototype first, let me react, then finish it and
+verify it at phone width before you call it done.</pre>
+      <p class="muted">Lesson: the whole method end to end. With Amadej, deploy it via Dokploy so it ends as a live URL, because that feeling is the point.</p>
+    </div>
+
+    <div class="card ex-prompt" style="border-color:#3d4a2a">
+      <h3>6 · The final assignment: NativeAI landing page <span class="pill lime">graded by Amadej</span></h3>
+      <p class="muted">This is the real one: your Claude researches on the web, analyzes a reference site with Playwright, extracts brand and content from our deck, and ships a landing page. Paste the prompt exactly as written. It exercises everything: the three doors, context extraction, prototyping, verification.</p>
+      <pre>Odpri https://amadejdemsar-create.github.io/nativeai-onboarding/prezentacija.html s Playwrightom in se sprehodi čez vse
+slajde (preizkusi tudi interakcije). Iz nje izlušči: kaj je NativeAI,
+komu in kaj prodaja, ton komunikacije in design sistem (barve,
+tipografija, stil).
+
+Nato odpri https://terafab.ai, posnemi screenshote vseh sekcij
+(desktop in mobile) in preglej HTML. Analiziraj: strukturo sekcij
+(hero, kako deluje, zaupanje, CTA ...), hierarhijo, ritem in kaj
+naredi stran prepričljivo.
+
+Zdaj zgradi landing page za NativeAI kot eno samo HTML datoteko:
+struktura in kvaliteta po zgledu terafab.ai, ampak v celoti
+NativeAI design in vsebina iz prezentacije. Brez lorem ipsuma,
+brez mrtvih gumbov.
+
+Preden rečeš končano: s Playwrightom posnemi svojo stran na 1440
+in 390 px, poglej screenshote, popravi, kar štrli, in mi pokaži
+rezultat.</pre>
+      <p class="muted">Lesson: this is the exact shape of client work. If the result looks like NativeAI and reads like terafab's structure, you have understood the whole course.</p>
+    </div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <div class="num">07</div>
+    <h2>Rules of the road</h2>
+    <div class="callout red">
+      <b>Red line:</b> the Nevron tool stack (Attio, Instantly, HeyReach, Apollo, dokploy-nevron, Firecrawl subscription) is never used for NativeAI work. Separate companies, separate tools, no exceptions. If a workflow seems to need one of them, the workflow gets redesigned.
+    </div>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Rule</th><th>What it means in practice</th></tr>
+      <tr><td>Draft-first outbound</td><td>Anything leaving the company (email, post, message to a client) is a draft until a human approves it. The AI writes, you send.</td></tr>
+      <tr><td>Least privilege</td><td>Connections get added when the work demands them, not upfront. The AI gets the intern's keys.</td></tr>
+      <tr><td>Everything reversible</td><td>Work lives in git. Every change is tracked, every mistake is an undo, which is exactly why we can let the AI work autonomously.</td></tr>
+      <tr><td>Honest status</td><td>"Partially done, X remains" beats "done!". This applies to the AI (it's in your CLAUDE.md) and to us.</td></tr>
+      <tr><td>Tasks in NativeAI OS</td><td>Work that isn't a task doesn't exist. Start it as a task, close it with a note.</td></tr>
+    </table>
+    </div>
+    <h3 style="margin-top:28px">Subscriptions (verified 16. 7. 2026)</h3>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Budget</th><th>Setup</th></tr>
+      <tr><td>$20/mo</td><td>Claude Pro, includes Claude Code. The starting point for both of you.</td></tr>
+      <tr><td>+$0</td><td>ChatGPT Free includes Codex with small limits, our second-opinion tool.</td></tr>
+      <tr><td>$100 to 200/mo</td><td>Claude Max 5x / 20x, upgrade when you hit Pro limits doing real work. Frame it as salary for a digital worker, not a software cost.</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    NativeAI internal · lives at <code>Business/NativeAI/Context/team-onboarding/</code> · companion to the onboarding deck · sister guides: <code>vodic-aplikacije.html</code> (how an app is composed, layer by layer) and <code>orodja.html</code> (agent-ready tools map with a prompt generator) · when this guide survives two real users, it graduates into the client toolkit.
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.ex-prompt pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.textContent = '📋 Kopiraj prompt';
+    btn.style.cssText = 'font:600 .8rem "Space Grotesk";background:#BEF264;color:#0A0A0C;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;margin-top:10px;display:block';
+    btn.onclick = () => navigator.clipboard.writeText(pre.textContent).then(() => { btn.textContent = '✓ Kopirano'; setTimeout(() => btn.textContent = '📋 Kopiraj prompt', 1500); });
+    pre.after(btn);
+  });
+</script>
+</body>
+</html>

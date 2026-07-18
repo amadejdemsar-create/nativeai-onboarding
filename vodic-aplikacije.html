@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iz česa je narejena aplikacija · NativeAI vodič</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--lime:#BEF264;--ink:#0A0A0C;--panel:#141417;--panel2:#1b1b20;--text:#E8E8EA;--muted:#9b9ba3;--line:#2a2a31;--warn:#fca5a5}
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scrollbar-color:#3a3a42 var(--ink)}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:#3a3a42;border-radius:8px;border:2px solid var(--ink)}
+  body{margin:0;background:var(--ink);color:var(--text);font:16px/1.65 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+  h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0 0 .5em}
+  h1{font-size:clamp(2rem,5vw,3.1rem)}
+  h2{font-size:clamp(1.4rem,3.2vw,1.9rem)}
+  h3{font-size:1.1rem;color:var(--lime)}
+  p{margin:.4em 0 1em}
+  a{color:var(--lime)}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+  header.hero{padding:68px 0 36px;border-bottom:1px solid var(--line)}
+  .kicker{color:var(--lime);font-family:"Space Grotesk";font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem}
+  .lead{color:var(--muted);max-width:660px;font-size:1.04rem}
+  .pill{display:inline-block;background:#232329;border:1px solid var(--line);border-radius:999px;padding:2px 12px;font-size:.75rem;color:var(--muted);margin-right:6px;white-space:nowrap}
+  .pill.lime{background:var(--lime);color:var(--ink);border-color:var(--lime);font-weight:600}
+  section{padding:48px 0;border-bottom:1px solid var(--line)}
+  .num{color:var(--lime);font-family:"JetBrains Mono";font-size:.85rem}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0}
+  .muted{color:var(--muted)}
+  .grid3{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+  .grid3>*{min-width:0}
+  code{font-family:"JetBrains Mono",monospace;font-size:.9em;background:#1e1e24;padding:.1em .35em;border-radius:5px}
+
+  /* stack visual */
+  .stackwrap{margin:26px 0 8px}
+  .stacktoggle{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .stbtn{font:600 .85rem "Space Grotesk";border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:9px 16px;cursor:pointer}
+  .stbtn.on{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .stack{display:flex;flex-direction:column;gap:6px;max-width:560px}
+  .disc{border-radius:12px;padding:13px 18px;font:600 .92rem "Space Grotesk";border:1px solid var(--line);background:var(--panel);cursor:pointer;transition:transform .15s;display:flex;justify-content:space-between;gap:10px;align-items:center;text-decoration:none;color:var(--text)}
+  .disc:hover{transform:translateX(6px);border-color:var(--lime)}
+  .disc .when{font:500 .72rem Inter;color:var(--muted);text-align:right}
+  .disc.big{padding:26px 18px;font-size:1.05rem}
+  .disc[data-adv]{display:none}
+  .stack.full .disc[data-adv]{display:flex;animation:pop .35s both}
+  .stack.full .disc.big{display:none}
+  @keyframes pop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .disc.l1{border-left:4px solid #eab308}.disc.l2{border-left:4px solid #3b82f6}.disc.l3{border-left:4px solid #14b8a6}
+  .disc.l4{border-left:4px solid #22c55e}.disc.l5{border-left:4px solid #6b7280}.disc.l6{border-left:4px solid #a3a3a3}
+  .disc.l7{border-left:4px solid #f59e0b}.disc.l8{border-left:4px solid #ef4444}.disc.l9{border-left:4px solid #dc2626}
+  .disc.l10{border-left:4px solid #8b5cf6}.disc.l11{border-left:4px solid #f97316}
+
+  /* layer sections */
+  .layersec .fieldrow{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));margin-top:14px}
+  .fieldrow>*{min-width:0}
+  .field{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 16px}
+  .field .flab{font:600 .68rem "Space Grotesk";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .field.oss .flab{color:#7dd3fc}
+  .field.paid .flab{color:var(--lime)}
+  .field p{margin:0;font-size:.87rem}
+  .need{border-left:3px solid var(--lime);background:var(--panel2);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.9rem}
+  .need b{color:var(--lime)}
+  .need.skip{border-color:#6b7280}
+  .need.skip b{color:var(--muted)}
+  .price{font-size:.8rem;color:var(--muted);margin-top:10px}
+  footer{padding:44px 0;color:var(--muted);font-size:.85rem}
+
+  /* mini vizuali */
+  .viz{margin:18px 0 6px;max-width:680px}
+  .viz .vcap{font:600 .68rem "Space Grotesk";letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-bottom:8px}
+  .duo{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+  .duo>*{min-width:0}
+  .bfr{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .bfr .bb{display:flex;align-items:center;gap:6px;background:var(--panel2);border-bottom:1px solid var(--line);padding:6px 10px}
+  .bfr .bd{width:8px;height:8px;border-radius:50%;background:#3a3a42}
+  .bfr .bu{flex:1;min-width:0;background:#0f0f12;border:1px solid var(--line);border-radius:5px;padding:2px 8px;font:500 .66rem "JetBrains Mono";color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bfr .bc{padding:14px 16px}
+  .cfr{background:#0f0f12;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .cfr .cb{background:var(--panel2);border-bottom:1px solid var(--line);padding:5px 10px;font:500 .66rem "JetBrains Mono";color:var(--muted)}
+  .cfr pre{margin:0;padding:11px 13px;font:11.5px/1.65 "JetBrains Mono";color:#c9c9d1;overflow-x:auto;white-space:pre}
+  .cfr .k{color:#d8b4fe}.cfr .s{color:#d6f5a3}.cfr .c{color:#6b7280}.cfr .err{color:#f87171}
+  .frow{margin-bottom:9px}
+  .frow .fl{font:600 .62rem "Space Grotesk";letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  .frow .fv{background:#0f0f12;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:.8rem}
+  .bbtn{display:inline-block;background:var(--lime);color:var(--ink);font:700 .78rem "Space Grotesk";border-radius:8px;padding:8px 14px}
+  .dbt{width:100%;border-collapse:collapse;font:10.5px/1.5 "JetBrains Mono";display:block;overflow-x:auto}
+  .dbt th{color:var(--muted);text-align:left;border-bottom:1px solid var(--line);padding:4px 8px}
+  .dbt td{padding:4px 8px;border-bottom:1px solid #1c1c22;color:#c9c9d1;white-space:nowrap}
+  .dbt tr.new td{background:#141a0e;color:var(--lime)}
+  .mailc{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .mailc .mh{font:500 .68rem "JetBrains Mono";color:var(--muted)}
+  .mailc .ms{font:700 .85rem "Space Grotesk";margin:5px 0 3px}
+  .mailc .mb{font-size:.76rem;color:var(--muted)}
+  .flown{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font:600 .78rem "Space Grotesk"}
+  .flown .fn{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 12px;white-space:nowrap}
+  .flown .fn.hot{border-color:var(--lime);color:var(--lime)}
+  .flown .fa{color:#4a4a52}
+  .bars{display:flex;align-items:flex-end;gap:8px;height:80px;padding:6px 2px 0}
+  .bars i{flex:1;max-width:44px;background:#26330f;border:1px solid #3d4a2a;border-radius:5px 5px 0 0}
+  .bars i.top{background:var(--lime);border-color:var(--lime)}
+  .latrow{display:flex;align-items:center;gap:10px;margin:7px 0}
+  .latrow .ll{font:500 .74rem Inter;color:var(--muted);width:190px;flex:0 0 auto}
+  .latrow .lb{height:10px;border-radius:999px;background:#4a3a3a;min-width:0}
+  .latrow .lb.fast{background:var(--lime)}
+  .latrow .lv{font:600 .72rem "JetBrains Mono";color:var(--muted);flex:0 0 auto}
+  .reql{list-style:none;margin:0;padding:0;font-size:.8rem}
+  .reql li{display:flex;gap:9px;align-items:baseline;padding:7px 0;border-bottom:1px solid #1c1c22}
+  .reql li:last-child{border:0}
+  .reql .ok{color:var(--lime)}.reql .no{color:#f87171}
+  .commits{list-style:none;margin:0;padding:0;font-size:.8rem}
+  .commits li{position:relative;padding:0 0 14px 22px;color:var(--muted)}
+  .commits li::before{content:"";position:absolute;left:4px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--lime)}
+  .commits li:not(:last-child)::after{content:"";position:absolute;left:8px;top:16px;bottom:-2px;width:1.5px;background:var(--line)}
+  .commits b{color:var(--text)}
+  @media(max-width:520px){.latrow .ll{width:130px;font-size:.68rem}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">NativeAI · vodič za ne-programerje</div>
+    <h1>Iz česa je v resnici narejena <span style="color:var(--lime)">aplikacija</span>.</h1>
+    <p class="lead">Frontend in backend sta samo vrh. Ta vodič razloži vsak sloj produkcijske aplikacije: kaj je, kdaj ga v resnici rabiš in katera odprtokodna ter plačljiva orodja so najboljša izbira. Brez programerskega predznanja.</p>
+    <p><span class="pill lime">v1 · 17. 7. 2026</span> <span class="pill">cene preverjene na uradnih straneh</span> <span class="pill">par vodiču »Working with your AI coworker«</span></p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="num">SKLAD</div>
+    <h2>Kar večina misli, in produkcijska resnica</h2>
+    <p class="muted">Preklopi pogled. Vsak sloj v polnem skladu je klikljiv in te pelje do razlage.</p>
+    <div class="stackwrap">
+      <div class="stacktoggle">
+        <button class="stbtn on" onclick="stackView(false,this)">kar večina misli</button>
+        <button class="stbtn" onclick="stackView(true,this)">produkcijska resnica</button>
+      </div>
+      <div class="stack" id="stack">
+        <a class="disc big l1" href="#l-front">Frontend <span class="when">kar uporabnik vidi</span></a>
+        <a class="disc big l2" href="#l-front">Backend <span class="when">logika v ozadju</span></a>
+        <a class="disc l1" data-adv href="#l-front">Frontend + Backend <span class="when">vedno</span></a>
+        <a class="disc l2" data-adv href="#l-host">Hosting & deploy <span class="when">vedno</span></a>
+        <a class="disc l3" data-adv href="#l-db">Baza & podatki <span class="when">takoj ko si kaj zapomni</span></a>
+        <a class="disc l4" data-adv href="#l-auth">Auth & pravice <span class="when">ko so računi</span></a>
+        <a class="disc l5" data-adv href="#l-mail">Pošiljanje mailov <span class="when">ko app piše uporabnikom</span></a>
+        <a class="disc l6" data-adv href="#l-pay">Plačila <span class="when">ko zaračunavaš</span></a>
+        <a class="disc l7" data-adv href="#l-files">Datoteke & storage <span class="when">ko so uploadi</span></a>
+        <a class="disc l8" data-adv href="#l-analytics">Analitika <span class="when">od launcha</span></a>
+        <a class="disc l9" data-adv href="#l-errors">Napake & logi <span class="when">ko so pravi uporabniki</span></a>
+        <a class="disc l10" data-adv href="#l-cdn">Cache & CDN <span class="when">ko je prometa veliko</span></a>
+        <a class="disc l11" data-adv href="#l-ci">Git & CI/CD <span class="when">od prve vrstice</span></a>
+        <a class="disc l5" data-adv href="#l-sec">Varnost (WAF, limiti) <span class="when">ko si javen</span></a>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:18px">Pomiri se: <b style="color:var(--lime)">Claude Code zna postaviti in povezati vse te sloje.</b> Vajino delo je vedeti, da obstajajo, kdaj kateri šteje, in katero orodje izbrati. Točno to je spodaj.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="num">TRI POTI DO ORODIJ</div>
+    <h2>CLI, MCP in API v eni minuti</h2>
+    <p class="muted">Vsak sloj spodaj je orodje ali storitev. Agent (in tudi tvoja aplikacija) do njih pride po eni od treh poti; ko primerjaš orodja, vedno preveri, katero od teh sploh ponujajo.</p>
+    <div class="grid3">
+      <div class="card" style="margin:0"><h3>⌨️ CLI</h3><p class="muted" style="font-size:.87rem;margin:0">Ukazna vrstica: orodje upravljaš z ukazi v terminalu. Za agenta najbolj naraven jezik, ker terminal že govori.</p></div>
+      <div class="card" style="margin:0"><h3>🔌 MCP</h3><p class="muted" style="font-size:.87rem;margin:0">Standardni vtič, narejen prav za AI agente: orodje se samo predstavi (kaj zna, kaj rabi) in agent ga takoj uporablja. Najmlajša in najhitreje rastoča pot.</p></div>
+      <div class="card" style="margin:0"><h3>🌐 API</h3><p class="muted" style="font-size:.87rem;margin:0">Strojni vmesnik storitve: zahteve gredo neposredno v storitev, brez ekrana. Najstarejša in najbolj razširjena pot; skoraj vsak resen servis ga ima.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="layersec" id="l-front">
+  <div class="wrap">
+    <div class="num">SLOJ 1 + 2</div>
+    <h2>Frontend in backend</h2>
+    <p class="muted">Frontend je vse, kar uporabnik vidi in klika (strani, gumbi, obrazci). Backend je logika, ki teče v ozadju: preverja, računa, odloča, kaj se sme. To sta sloja, ki ju Claude Code piše neposredno; vse ostalo v tem vodiču so temelji in priklopi okoli njiju.</p>
+    <div class="viz"><div class="vcap">isti klik, dva svetova</div>
+      <div class="duo">
+        <div class="bfr"><div class="bb"><span class="bd"></span><span class="bd"></span><span class="bd"></span><span class="bu">tvoja-stran.si/rezervacija</span></div>
+          <div class="bc"><div class="frow"><div class="fl">Termin</div><div class="fv">četrtek, 10.00</div></div><span class="bbtn">Rezerviraj</span></div></div>
+        <div class="cfr"><div class="cb">backend · uporabnik tega nikoli ne vidi</div><pre><span class="k">if</span> (!terminProst) <span class="k">return</span> zavrni()
+<span class="k">if</span> (!prijavljen)  <span class="k">return</span> zavrni()
+shrani(rezervacija)   <span class="c">// → baza</span></pre></div>
+      </div>
+    </div>
+    <div class="need"><b>Rabiš:</b> vedno, to JE aplikacija.</div>
+  </div>
+</section>
+
+<section class="layersec" id="l-host">
+  <div class="wrap">
+    <div class="num">SLOJ 3</div>
+    <h2>Hosting & deploy</h2>
+    <p class="muted">Strežnik, na katerem aplikacija teče in je dostopna na internetu, plus mehanizem, ki novo kodo spravi v živo (deploy).</p>
+    <div class="viz"><div class="vcap">pot od kode do živega URL-ja</div>
+      <div class="flown"><span class="fn">💻 koda</span><span class="fa">→</span><span class="fn">git push</span><span class="fa">→</span><span class="fn">🔨 build (Dokploy)</span><span class="fa">→</span><span class="fn hot">🌍 tvoja-stran.si</span></div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> vedno, aplikacija mora nekje teči.</div>
+    <div class="need skip"><b>Namig:</b> upravljana platforma se splača od prvega dne; lasten strežnik s PaaS slojem se splača, ko imaš več aplikacij in nočeš plačevati vsake posebej.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source · na svojem strežniku</div><p><b>Dokploy</b> ali <b>Coolify</b>: Vercel-stil deploy (push → build → live) na tvojem VPS. Naša izbira: Dokploy, na njem teče vse naše.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · upravljano</div><p><b>Vercel</b> (odličen za Next.js) ali Render/Railway. Nič vzdrževanja, hitro, dražje pri rasti.</p></div>
+    </div>
+    <p class="price">Vercel: Hobby 0 $, Pro 20 $/m z vključenim kreditom (vir: vercel.com/pricing, 17. 7. 2026). Dokploy/Coolify: strošek je samo VPS (nekaj € na mesec).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-db">
+  <div class="wrap">
+    <div class="num">SLOJ 4</div>
+    <h2>Baza podatkov & podatki</h2>
+    <p class="muted">Spomin aplikacije: uporabniki, naročila, vsebina. Tabele z vrsticami, kot Excel s pravili, samo zanesljivo in hitro.</p>
+    <div class="viz"><div class="vcap">tabela rezervacije, nova vrstica pravkar zapisana</div>
+      <table class="dbt"><tr><th>id</th><th>stranka</th><th>termin</th><th>storitev</th></tr>
+      <tr><td>41</td><td>Kovač</td><td>pet 9.00</td><td>cepljenje</td></tr>
+      <tr class="new"><td>42</td><td>Novak</td><td>čet 10.00</td><td>pregled psa</td></tr></table>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> takoj ko si aplikacija karkoli zapomni med obiski.</div>
+    <div class="need skip"><b>Overkill:</b> statična predstavitvena stran brez podatkov je ne rabi.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>PostgreSQL</b>: industrijski standard, teče na katerem koli strežniku. Naša privzeta izbira.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · upravljano</div><p><b>Supabase</b> (Postgres + auth + storage v paketu) ali <b>Neon</b> (serverless Postgres).</p></div>
+    </div>
+    <p class="price">Supabase: Free 0 $, Pro 25 $/m (vir: supabase.com/pricing, 17. 7. 2026). Neon: Free 0 $, Launch ~15 $/m po porabi (vir: neon.tech/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-auth">
+  <div class="wrap">
+    <div class="num">SLOJ 5</div>
+    <h2>Auth & pravice (uporabniki)</h2>
+    <p class="muted">Registracija, prijava, pozabljeno geslo, Google prijava, in kdo sme videti kaj (vloge, pravice). Nikoli se ne piše na roko; vzame se preverjena rešitev.</p>
+    <div class="viz"><div class="vcap">prijava + vloge</div>
+      <div class="duo">
+        <div class="bfr"><div class="bb"><span class="bd"></span><span class="bd"></span><span class="bd"></span><span class="bu">tvoja-stran.si/prijava</span></div>
+          <div class="bc"><div class="frow"><div class="fl">E-pošta</div><div class="fv">ana@firma.si</div></div><div class="frow"><div class="fl">Geslo</div><div class="fv">••••••••</div></div><span class="bbtn">Prijava</span></div></div>
+        <div class="cfr"><div class="cb">vloge · kdo sme kaj</div><pre>👑 admin    <span class="c">vidi in ureja vse</span>
+✏️ urednik  <span class="c">ureja vsebino</span>
+👁️ gost     <span class="c">samo gleda</span></pre></div>
+      </div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> takoj ko imajo uporabniki račune ali zasebne podatke.</div>
+    <div class="need skip"><b>Overkill:</b> javna stran brez prijave.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Better Auth</b> (knjižnica v aplikaciji, jo uporabljamo v CoachMeAI) ali <b>Keycloak</b> (samostojen identitetni strežnik za večje sisteme).</p></div>
+      <div class="field paid"><div class="flab">plačljivo · upravljano</div><p><b>Clerk</b>: gotova prijava z vmesnikom, seje, upravljanje uporabnikov, minimalno dela.</p></div>
+    </div>
+    <p class="price">Clerk: Hobby brezplačno do limita aktivnih uporabnikov, Pro 20 $/m + poraba (vir: clerk.com/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-mail">
+  <div class="wrap">
+    <div class="num">SLOJ 6</div>
+    <h2>Pošiljanje mailov</h2>
+    <p class="muted">Aplikacija sama pošilja maile: potrditev registracije, ponastavitev gesla, račune, obvestila. Ključno je, da mail res pride v inbox (deliverability), zato se to skoraj vedno kupi kot servis.</p>
+    <div class="viz"><div class="vcap">backend sproži, servis dostavi</div>
+      <div class="flown" style="margin-bottom:10px"><span class="fn">⚙️ backend</span><span class="fa">→</span><span class="fn">📮 Resend</span><span class="fa">→</span><span class="fn hot">inbox stranke</span></div>
+      <div class="mailc"><div class="mh">Od: Tvoja firma &lt;app@tvoja-firma.si&gt;</div><div class="mh">Za: ana@gmail.com</div><div class="ms">Naročilo potrjeno ✓</div><div class="mb">Hvala za naročilo #1042. Račun je v priponki.</div></div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> takoj ko app piše uporabnikom.</div>
+    <div class="need skip"><b>Namig:</b> lasten mail strežnik je mazohizem; tu je servis prava izbira tudi za nas, ki sicer self-hostamo.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Postal</b> (transakcijski mail strežnik) ali <b>Listmonk</b> (bolj newsletter). Realno: redko vredno truda.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · priporočeno</div><p><b>Resend</b>: razvijalcem najprijaznejši in naša izbira. Alternativa, če šteje vsak cent na velikih količinah: AWS SES.</p></div>
+    </div>
+    <p class="price">Resend: Free 3.000 mailov/m, Pro 20 $/m za 50.000 (vir: resend.com/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-pay">
+  <div class="wrap">
+    <div class="num">SLOJ 7</div>
+    <h2>Plačila</h2>
+    <p class="muted">Kartice, naročnine, checkout, računi. Procesor plačil je reguliran posel, zato odprtokodne alternative za samo procesiranje ni; open source so kvečjemu ogrodja okoli njega.</p>
+    <div class="viz"><div class="vcap">checkout in signal nazaj</div>
+      <div class="duo">
+        <div class="bfr"><div class="bb"><span class="bd"></span><span class="bd"></span><span class="bd"></span><span class="bu">checkout.stripe.com</span></div>
+          <div class="bc"><div class="frow"><div class="fl">Kartica</div><div class="fv">•••• •••• •••• 4242</div></div><span class="bbtn">Plačaj 190 €</span></div></div>
+        <div class="cfr"><div class="cb">kaj dobi tvoja aplikacija</div><pre><span class="c">// Stripe sporoči backendu:</span>
+{ event: <span class="s">"plačano ✓"</span>,
+  znesek: <span class="s">190</span>, stranka: <span class="s">"Ana"</span> }
+<span class="c">// kartice se nikoli ne dotakneš</span></pre></div>
+      </div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> takoj ko zaračunavaš v aplikaciji.</div>
+    <div class="need skip"><b>Overkill:</b> če se plačuje po predračunu ali v živo, plačilnega sloja sploh ne rabiš.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p>Pravega OSS procesorja ni. <b>Medusa</b> in podobna ogrodja pokrijejo trgovino, procesor je še vedno zunanji.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · standard</div><p><b>Stripe</b>: privzeta izbira (tudi naša). Alternativa z manj birokracije okoli DDV: merchant-of-record (Paddle, Lemon Squeezy).</p></div>
+    </div>
+    <p class="price">Stripe: brez mesečnine, provizija na transakcijo (na ameriški strani 2,9 % + 30 ¢; evropske kartične provizije so drugačne, preveri EU cenik pred računico) (vir: stripe.com/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-files">
+  <div class="wrap">
+    <div class="num">SLOJ 8</div>
+    <h2>Datoteke & storage</h2>
+    <p class="muted">Uploadi, slike, PDF-ji, video: veliki fajli ne sodijo v bazo, ampak v object storage (S3 tip), ki jih streže po spletu.</p>
+    <div class="viz"><div class="vcap">upload gre mimo baze, naravnost v storage</div>
+      <div class="flown"><span class="fn">📄 pogodba.pdf (8 MB)</span><span class="fa">→</span><span class="fn">🪣 object storage</span><span class="fa">→</span><span class="fn hot">🔗 povezava za stranko</span></div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> ko uporabniki nalagajo datoteke ali imaš veliko medijev.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>MinIO</b>: S3-kompatibilen storage na lastnem strežniku, aplikacija ne opazi razlike.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · upravljano</div><p><b>Cloudflare R2</b> (brez stroškov prenosa ven) ali AWS S3 (standard).</p></div>
+    </div>
+    <p class="price">R2: 10 GB brezplačno, potem 0,015 $/GB-mesec, prenos ven 0 $ (vir: developers.cloudflare.com/r2/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-analytics">
+  <div class="wrap">
+    <div class="num">SLOJ 9</div>
+    <h2>Analitika</h2>
+    <p class="muted">Kdo pride, od kod, kaj klikne, kje odneha. Brez tega o svoji strani samo ugibaš.</p>
+    <div class="viz"><div class="vcap">teden na tvoji strani</div>
+      <div class="bars"><i style="height:34%"></i><i style="height:48%"></i><i style="height:42%"></i><i style="height:66%"></i><i class="top" style="height:100%"></i><i style="height:58%"></i><i style="height:38%"></i></div>
+      <p class="muted" style="font-size:.78rem;margin:8px 0 0">1.284 obiskov · vrh v četrtek (objava na LinkedInu) · konverzija 3,1 %</p>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> od launcha vsake javne strani.</div>
+    <div class="need skip"><b>Overkill:</b> interno orodje za pet znanih ljudi.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Umami</b> ali <b>Plausible</b> (self-hosted): lahka, brez piškotkov, GDPR prijazna, na tvojem strežniku zastonj.</p></div>
+      <div class="field paid"><div class="flab">plačljivo</div><p><b>Plausible Cloud</b> (isti izdelek, brez vzdrževanja) ali Google Analytics 4 (brezplačen, plačaš s podatki).</p></div>
+    </div>
+    <p class="price">Plausible Cloud: od 9 $/m do 10k ogledov (vir: plausible.io, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-errors">
+  <div class="wrap">
+    <div class="num">SLOJ 10</div>
+    <h2>Napake & logi</h2>
+    <p class="muted">Ko aplikaciji kaj poči, hočeš to izvedeti prej kot od jezne stranke: sistem samodejno ujame napako, kje se je zgodila in komu.</p>
+    <div class="viz"><div class="vcap">napaka se zgodi ob 2h zjutraj; izveš ti, ne stranka</div>
+      <div class="cfr"><div class="cb">logi · produkcija</div><pre>02:14  GET /cenik            <span class="s">200 ok</span>
+02:14  POST /checkout        <span class="s">200 ok</span>
+02:15  POST /checkout        <span class="err">✗ TypeError: cena is undefined (checkout.js:42)</span>
+02:15  <span class="k">Sentry</span> → alarm v Slack: <span class="s">3 uporabniki prizadeti, nova napaka</span></pre></div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> takoj ko so na aplikaciji pravi uporabniki.</div>
+    <div class="need skip"><b>Overkill:</b> prototip za vikend.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>GlitchTip</b> (lahek, združljiv s Sentry) ali self-hosted <b>Sentry</b>.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · standard</div><p><b>Sentry</b>: standard kategorije, ujame napake in počasne dele aplikacije.</p></div>
+    </div>
+    <p class="price">Sentry: Developer 0 $, Team 26 $/m (vir: sentry.io/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-cdn">
+  <div class="wrap">
+    <div class="num">SLOJ 11</div>
+    <h2>Cache & CDN</h2>
+    <p class="muted">CDN streže stran s strežnikov blizu obiskovalca (hitrost po svetu); cache (Redis) hrani vroče podatke v spominu, da se ne računajo znova in znova.</p>
+    <div class="viz"><div class="vcap">ista stran, obiskovalec iz Avstralije</div>
+      <div class="latrow"><span class="ll">brez CDN · do tvojega strežnika</span><div class="lb" style="width:200px"></div><span class="lv">480 ms</span></div>
+      <div class="latrow"><span class="ll">s CDN · do bližnje kopije</span><div class="lb fast" style="width:22px"></div><span class="lv">45 ms</span></div>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> CDN pri javni strani z obiskovalci od vsepovsod; cache šele pri resnem prometu.</div>
+    <div class="need skip"><b>Namig:</b> Cloudflare free pokrije večino malih podjetij; dedicated cache je pogosto prezgodnja optimizacija.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Redis / Valkey</b> za cache. Odprtokodnega CDN omrežja ni (CDN je po definiciji gostovana mreža).</p></div>
+      <div class="field paid"><div class="flab">plačljivo</div><p><b>Cloudflare</b>: CDN + DNS + zaščita v enem; free plan je za začetek dovolj.</p></div>
+    </div>
+    <p class="price">Cloudflare: Free 0 $, Pro 20 $/m letno (vir: cloudflare.com/plans, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-ci">
+  <div class="wrap">
+    <div class="num">SLOJ 12</div>
+    <h2>Git & CI/CD</h2>
+    <p class="muted">Git hrani vsako spremembo kode (časovni stroj + undo za celo firmo); CI/CD ob vsaki spremembi samodejno požene teste in deploy. To je tudi razlog, da agentu lahko pustiš delati: vse je popravljivo.</p>
+    <div class="viz"><div class="vcap">git zgodovina = časovni stroj s tipko undo</div>
+      <ul class="commits">
+        <li><b>dodan nov cenik</b> · danes 10.12 · Claude</li>
+        <li><b>popravljen obrazec na telefonu</b> · včeraj 16.40</li>
+        <li><b>prva verzija strani</b> · ponedeljek</li>
+      </ul>
+      <p class="muted" style="font-size:.78rem;margin:2px 0 0">Vsaka pika je stanje, na katero se lahko vrneš. Zato agentu lahko pustiš delati.</p>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> od prve vrstice kode, tudi če delaš sam.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Gitea / Forgejo</b> ali GitLab CE na svojem strežniku.</p></div>
+      <div class="field paid"><div class="flab">plačljivo · standard</div><p><b>GitHub</b>: prevladujoča izbira (tudi naša), z Actions za CI/CD.</p></div>
+    </div>
+    <p class="price">GitHub: Free 0 $ (2.000 CI minut/m), Team 4 $/uporabnika/m (vir: github.com/pricing, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section class="layersec" id="l-sec">
+  <div class="wrap">
+    <div class="num">SLOJ 13</div>
+    <h2>Varnost: WAF & rate limiting</h2>
+    <p class="muted">WAF (požarni zid za splet) blokira zlonamerni promet in bote; rate limiting omeji, kolikokrat sme nekdo udariti po aplikaciji (proti zlorabi in stroškovnim eksplozijam).</p>
+    <div class="viz"><div class="vcap">kaj vidi požarni zid v eni minuti</div>
+      <ul class="reql">
+        <li><span class="ok">✓</span> obiskovalka iz Kranja odpre /cenik <span class="ok" style="margin-left:auto">spuščena</span></li>
+        <li><span class="no">✗</span> bot preizkuša gesla na /prijava <span class="no" style="margin-left:auto">blokiran · WAF</span></li>
+        <li><span class="no">✗</span> 500 zahtev/s z enega naslova <span class="no" style="margin-left:auto">omejen · rate limit</span></li>
+      </ul>
+    </div>
+
+    <div class="need"><b>Rabiš:</b> ko je aplikacija javna in ima prijavo, plačila ali obrazce.</div>
+    <div class="need skip"><b>Overkill:</b> interno orodje za ekipo.</div>
+    <div class="fieldrow">
+      <div class="field oss"><div class="flab">open source</div><p><b>Traefik / Nginx / Caddy</b> (rate limiting) + fail2ban; <b>ModSecurity</b> kot OSS WAF.</p></div>
+      <div class="field paid"><div class="flab">plačljivo</div><p><b>Cloudflare</b>: osnovni WAF in DDoS zaščita že na free planu.</p></div>
+    </div>
+    <p class="price">Cloudflare: Free 0 $ z osnovno zaščito; Pro 20 $/m doda pravila (vir: cloudflare.com/plans, 17. 7. 2026).</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="num">NAŠ SKLAD</div>
+    <h2>Kako te sloje sestavimo mi</h2>
+    <div class="card">
+      <p style="margin:0" class="muted">Hosting: <b style="color:var(--text)">Dokploy na lastnem VPS</b> · baza: <b style="color:var(--text)">PostgreSQL</b> · auth: <b style="color:var(--text)">Better Auth</b> · maili: <b style="color:var(--text)">Resend</b> · plačila: <b style="color:var(--text)">Stripe</b> · koda: <b style="color:var(--text)">GitHub</b>, push na main = deploy. Filozofija: open source na svojem strežniku, kjer je zrelo (hosting, baza, CRM, analitika), servis, kjer se pošteno splača (maili, plačila). In vse to postavi in vzdržuje Claude Code; postopek za deploy imamo popisan v internem Dokploy vodiču.</p>
+    </div>
+    <p class="muted">Vir s prodajnimi stranmi in datumi za vsako ceno zgoraj: <code>research/stack-layers-research.md</code>. Cene se spreminjajo; pred odločitvijo preveri uradni cenik (ali pa naj ga preveri tvoj agent).</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">NativeAI interno · živi v <code>Business/NativeAI/Context/team-onboarding/</code> · sestrska vodiča: »Working with your AI coworker« (guide.html) in zemljevid agent-ready orodij (orodja.html).</div>
+</footer>
+
+<script>
+  function stackView(full,btn){document.getElementById('stack').classList.toggle('full',full);[...document.querySelectorAll('.stbtn')].forEach(b=>b.classList.toggle('on',b===btn))}
+</script>
+</body>
+</html>

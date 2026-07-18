@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kako delamo · NativeAI onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--lime:#BEF264;--ink:#0A0A0C;--panel:#141417;--panel2:#1c1c22;--text:#E8E8EA;--muted:#98989f;--line:#2a2a31;--red:#f87171;--blue:#7dd3fc}
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--text);font:16px/1.6 Inter,system-ui,sans-serif}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:#3a3a42;border-radius:8px;border:2px solid var(--ink)}
+  html{scrollbar-color:#3a3a42 var(--ink)}
+  h1,h2,h3{font-family:"Space Grotesk",sans-serif;line-height:1.12;margin:0}
+  .slide{min-height:100svh;display:none;flex-direction:column;justify-content:center;padding:48px 24px 100px;max-width:1120px;margin:0 auto;width:100%}
+  .slide.active{display:flex;animation:slidein .35s}
+  @keyframes slidein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .kicker{color:var(--lime);font-family:"Space Grotesk";font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.76rem;margin-bottom:12px}
+  .slide h2{font-size:clamp(1.6rem,4.2vw,2.7rem);margin-bottom:10px}
+  .sub{color:var(--muted);max-width:660px;margin:0 0 30px}
+  .hud{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;background:rgba(10,10,12,.92);backdrop-filter:blur(8px);border-top:1px solid var(--line);z-index:20}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-width:0}
+  .dot{width:8px;height:8px;border-radius:50%;background:#333;cursor:pointer;flex:0 0 auto}
+  .dot.on{background:var(--lime)}
+  .navbtns{display:flex;gap:8px;flex:0 0 auto}
+  button{font:600 .85rem Inter;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:9px 15px;cursor:pointer}
+  button:hover{border-color:var(--lime)}
+  button.primary{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .hint{color:var(--muted);font-size:.75rem;flex:0 0 auto}
+  .lime{color:var(--lime)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+  .grid>*{min-width:0}
+  .tag{display:inline-block;background:#232329;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:.72rem;color:var(--muted);white-space:nowrap}
+
+  /* S1 naslovnica */
+  #s0{position:relative;overflow:hidden;max-width:none;padding-left:max(24px,calc((100vw - 1120px)/2 + 24px))}
+  #s0 .coverbg{position:absolute;inset:0;background:url("img/hero.jpg") right center/cover no-repeat;z-index:0}
+  #s0 .coverbg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--ink) 22%,rgba(10,10,12,.55) 60%,rgba(10,10,12,.15) 100%)}
+  #s0>:not(.coverbg){position:relative;z-index:1}
+  #s0 h1{font-size:clamp(2.6rem,8vw,5rem)}
+  #s0 .sub{font-size:1.1rem}
+  .halfimg{width:calc(100% + 44px);margin:-22px -22px 16px;height:170px;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+  .banner{width:100%;height:230px;object-fit:cover;border-radius:14px;border:1px solid var(--line);margin-bottom:22px;display:block}
+  @media(max-width:760px){.banner{height:160px}.halfimg{height:130px}}
+
+  /* S2 razcep dela */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px;position:relative}
+  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .half{border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--panel);position:relative;overflow:hidden;min-height:290px}
+  .half h3{font-size:1.25rem;margin-bottom:4px}
+  .half .who{font:600 .78rem "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:inline-block;padding:3px 10px;border-radius:6px}
+  .half.phys .who{background:#2a2330;color:#d8b4fe}
+  .half.digi .who{background:#2b3a1e;color:var(--lime)}
+  .chip{display:inline-block;margin:4px 5px 0 0;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:500 .8rem "Space Grotesk";animation:drop .5s both}
+  .chip:nth-child(odd){animation-delay:.15s}
+  .chip:nth-child(3n){animation-delay:.3s}
+  @keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+  .half .verdict{margin-top:18px;font:700 .95rem "Space Grotesk"}
+  .half.phys .verdict{color:#d8b4fe}
+  .half.digi .verdict{color:var(--lime)}
+
+  /* S3 zanka */
+  .loopstage{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:30px;align-items:center}
+  @media(max-width:820px){.loopstage{grid-template-columns:1fr}}
+  .loop{position:relative;width:min(300px,80vw);height:min(300px,80vw);margin:0 auto}
+  .loop .ring{position:absolute;inset:0;border:2px dashed var(--line);border-radius:50%}
+  .loop .stop{position:absolute;width:96px;text-align:center;font:700 .82rem "Space Grotesk";background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 6px;left:50%;top:50%}
+  .loop .stop.a{transform:translate(-50%,-50%) translateY(-132px)}
+  .loop .stop.b{transform:translate(-50%,-50%) translate(118px,66px)}
+  .loop .stop.c{transform:translate(-50%,-50%) translate(-118px,66px)}
+  .loop .ball{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--lime);left:50%;top:50%;margin:-7px;animation:orbit 6s linear infinite}
+  @keyframes orbit{from{transform:rotate(0deg) translateY(-140px)}to{transform:rotate(360deg) translateY(-140px)}}
+  .artifact{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font:500 .9rem/1.6 "JetBrains Mono";color:var(--muted)}
+  .artifact b{color:var(--text)}
+  .artifact .out{color:#d6f5a3}
+
+  /* S3 zanka: tabi primerov */
+  .looptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .ltab{font:600 .8rem "Space Grotesk";padding:7px 13px}
+  .ltab.on{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .min-w-0{min-width:0}
+
+  /* S3B računalnik */
+  .ctrlgrid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+  .ctrlgrid>*{min-width:0}
+  .fico{display:inline-block;position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 13px;margin:0 8px 8px 0;font:500 .82rem "Space Grotesk"}
+  .fico.sel{border-color:var(--lime);background:#141a0e}
+
+  /* S4 AI prevzame zanko */
+  .counter{font:700 clamp(2.6rem,7vw,4.4rem) "Space Grotesk";color:var(--lime)}
+  .racelane{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .lane{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .lane .lbl{font:600 .78rem "Space Grotesk";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .lane .track{height:10px;background:#26262c;border-radius:999px;overflow:hidden}
+  .lane .run{height:100%;border-radius:999px;background:#6b7280;width:0%}
+  .lane.ai .run{background:var(--lime)}
+  .lane.go .run{transition:width 3s linear}
+  .lane.ai.go .run{transition:width .45s ease-out}
+
+  /* S5 zaposlitev, 4 reže */
+  .slots{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+  .slot{border:1px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);transition:all .4s;cursor:pointer;min-width:0}
+  .slot .ico{font-size:1.9rem;display:block;margin-bottom:8px;filter:grayscale(1);opacity:.5;transition:all .4s}
+  .slot h3{font-size:1rem;color:inherit}
+  .slot p{font-size:.82rem;margin:.4em 0 0}
+  .slot.onn{border:1px solid var(--lime);color:var(--text);background:#141a0e}
+  .slot.onn .ico{filter:none;opacity:1}
+  .slot.onn h3{color:var(--lime)}
+
+  /* S6 kontekst stikalo */
+  .ctxwrap{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:24px;align-items:start}
+  @media(max-width:820px){.ctxwrap{grid-template-columns:1fr}}
+  .promptcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .promptcard .label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .promptcard p{margin:0;font-family:"JetBrains Mono";font-size:.86rem;line-height:1.55;color:#d6f5a3}
+  .ctxfiles{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+  .ctxfile{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font:500 .78rem "Space Grotesk";color:var(--muted);opacity:.25;transform:translateX(-14px);transition:all .5s}
+  .ctx-on .ctxfile{opacity:1;transform:none;color:var(--text);border-color:#3d4a2a}
+  .ctx-on .ctxfile b{color:var(--lime)}
+  .switchrow{display:flex;align-items:center;gap:12px;margin:16px 0 4px}
+  .switch{width:56px;height:30px;border-radius:999px;background:#333;position:relative;cursor:pointer;transition:background .3s;flex:0 0 auto}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#888;transition:all .3s}
+  .ctx-on .switch{background:var(--lime)}
+  .ctx-on .switch::after{left:29px;background:var(--ink)}
+  .switchlbl{font:700 .92rem "Space Grotesk"}
+  .outcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:46px 22px 20px;min-height:280px;position:relative}
+  .out.generic{color:var(--muted);font-style:italic}
+  .out.grounded{display:none}
+  .ctx-on .out.generic{display:none}
+  .ctx-on .out.grounded{display:block;animation:pop .5s}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .out .line{margin:0 0 10px}
+  .out .hl{color:var(--lime);font-weight:600;font-style:normal}
+  .stamp{position:absolute;top:12px;right:14px;font:700 .66rem "Space Grotesk";letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:6px}
+  .stamp.bad{background:#3a2626;color:var(--red)}
+  .stamp.good{background:#2b3a1e;color:var(--lime);display:none}
+  .ctx-on .stamp.bad{display:none}
+  .ctx-on .stamp.good{display:inline-block}
+
+  /* S7 troje vrat */
+  .doors{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+  .door{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden;min-width:0}
+  .door h3{font-size:1.02rem;margin-bottom:2px}
+  .door .spd{font:600 .72rem "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;display:inline-block}
+  .door.d1 .spd{color:var(--lime)}.door.d2 .spd{color:var(--blue)}.door.d3 .spd{color:var(--red)}
+  .door .flowtrack{height:34px;background:#0f0f12;border-radius:9px;position:relative;overflow:hidden;margin-bottom:12px}
+  .p{position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;left:-12px}
+  .door.d1 .p{background:var(--lime);animation:fly 1.1s linear infinite}
+  .door.d2 .p{background:var(--blue);animation:fly 3s linear infinite}
+  .door.d3 .p{background:var(--red);animation:fly 7s linear infinite}
+  .p.p2{animation-delay:.4s !important}.p.p3{animation-delay:.8s !important}
+  @keyframes fly{to{left:calc(100% + 12px)}}
+  .door p{font-size:.84rem;color:var(--muted);margin:0}
+
+  /* S8 prazna soba */
+  .roomwrap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start}
+  @media(max-width:820px){.roomwrap{grid-template-columns:1fr}}
+  .grants{display:flex;flex-direction:column;gap:9px}
+  .grant{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;font:600 .85rem "Space Grotesk";transition:border .3s}
+  .grant:hover{border-color:var(--lime)}
+  .grant .box{width:18px;height:18px;border:2px solid var(--muted);border-radius:5px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--ink)}
+  .grant.onn .box{background:var(--lime);border-color:var(--lime)}
+  .grant.onn .box::after{content:"✓"}
+  .room{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;min-height:250px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;position:relative}
+  .room .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-style:italic;font-size:.9rem;padding:20px;text-align:center}
+  .cap{background:var(--panel2);border:1px solid #3d4a2a;border-radius:10px;padding:9px 13px;font:500 .8rem "Space Grotesk";animation:pop .4s both;height:fit-content}
+  .cap b{color:var(--lime)}
+  .cap.gate{border-color:#4a3a2a}
+  .cap.gate b{color:#fbbf24}
+
+  /* S9 miza */
+  .meter{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .meter .lbl{font:600 .78rem "Space Grotesk";color:var(--muted);flex:0 0 auto}
+  .meter .bar{flex:1;height:12px;background:#26262c;border-radius:999px;overflow:hidden;min-width:0}
+  .meter .fill{height:100%;width:96%;background:var(--lime);border-radius:999px;transition:width .6s,background .6s}
+  .meter.low .fill{background:var(--red)}
+  .meter .pct{font:700 .92rem "JetBrains Mono";width:54px;text-align:right;flex:0 0 auto}
+  .deskstage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,215px);gap:22px;align-items:end}
+  @media(max-width:820px){.deskstage{grid-template-columns:1fr}}
+  .desk{background:var(--panel);border:1px solid var(--line);border-radius:14px;min-height:210px;padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;position:relative}
+  .desk::after{content:"glavna miza · tvoja seja";position:absolute;bottom:8px;right:12px;font:600 .68rem "Space Grotesk";color:var(--muted)}
+  .paper{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 11px;font:500 .73rem "Space Grotesk";color:var(--muted);animation:drop .35s;white-space:nowrap;height:fit-content}
+  .paper.core{border-color:#3d4a2a;color:var(--text)}
+  .sidedesk{background:var(--panel);border:1px dashed var(--line);border-radius:14px;min-height:140px;padding:12px;position:relative}
+  .sidedesk::after{content:"stranska miza · subagent";position:absolute;bottom:8px;right:10px;font:600 .64rem "Space Grotesk";color:var(--muted)}
+  .summary{background:var(--lime);color:var(--ink);border:none;font-weight:700;animation:pop .5s}
+  .btnrow{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+
+  /* S10 anatomija */
+  .anat .card h3{font-size:.98rem;color:var(--lime);margin-bottom:4px}
+  .anat .card .en{font:600 .7rem "JetBrains Mono";color:var(--muted);display:block;margin-bottom:8px}
+  .anat .card p{font-size:.84rem;color:var(--muted);margin:0}
+  .anat .card .ico{font-size:1.5rem;display:block;margin-bottom:8px}
+
+  /* S11 priklopi */
+  .conn .card{padding:16px 18px}
+  .conn .card h3{font-size:.95rem;margin-bottom:6px}
+  .conn .mini{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:500 .72rem "Space Grotesk";color:var(--muted);margin-top:8px}
+  .mini .n{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:3px 8px;white-space:nowrap}
+  .mini .n.you{border-color:var(--lime);color:var(--lime)}
+  .mini .a{color:var(--line)}
+
+  /* S12 spletna aplikacija */
+  .applayout{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:22px;align-items:start}
+  @media(max-width:860px){.applayout{grid-template-columns:minmax(0,1fr)}}
+  .applayout>*,.appview,.av{min-width:0}
+  .dbtable{display:block;overflow-x:auto}
+  .appstack{display:flex;flex-direction:column;gap:4px}
+  .layer{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;transition:all .35s}
+  .layer .min-w-0{min-width:0}
+  .layer h3{font-size:.98rem}
+  .layer p{margin:2px 0 0;font-size:.82rem;color:var(--muted)}
+  .layer .lico{font-size:1.5rem;flex:0 0 auto}
+  .layer.hot{border-color:var(--lime);background:#141a0e;box-shadow:0 0 0 1px var(--lime)}
+  .layer.hot h3{color:var(--lime)}
+  .ldown{color:var(--line);font-size:.9rem;padding-left:26px;line-height:1}
+  .appview{position:relative;min-height:340px}
+  .av{display:none;animation:pop .35s}
+  .av.on{display:block}
+  .avcap{font:600 .72rem "Space Grotesk";letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin:0 0 8px}
+  .bframe{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .bframe .bbar{display:flex;align-items:center;gap:8px;background:var(--panel2);border-bottom:1px solid var(--line);padding:8px 12px}
+  .bframe .bdot{width:9px;height:9px;border-radius:50%;background:#3a3a42}
+  .bframe .burl{flex:1;min-width:0;background:#0f0f12;border:1px solid var(--line);border-radius:6px;padding:3px 10px;font:500 .7rem "JetBrains Mono";color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bframe .bbody{padding:18px}
+  .formrow{margin-bottom:12px}
+  .formrow .flbl{font:600 .7rem "Space Grotesk";letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .formrow .fval{background:#0f0f12;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:.85rem}
+  .bbtn{display:inline-block;background:var(--lime);color:var(--ink);font:700 .85rem "Space Grotesk";border-radius:9px;padding:10px 18px;position:relative}
+  .cursor{position:absolute;right:-13px;bottom:-13px;font-size:1.25rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+  .cframe{background:#0f0f12;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cframe .cbar{display:flex;align-items:center;gap:8px;background:var(--panel2);border-bottom:1px solid var(--line);padding:7px 12px;font:500 .7rem "JetBrains Mono";color:var(--muted)}
+  .cframe pre{margin:0;padding:14px 16px;font:12.5px/1.7 "JetBrains Mono",monospace;color:#c9c9d1;overflow-x:auto;white-space:pre}
+  .cframe .k{color:#d8b4fe}.cframe .s{color:#d6f5a3}.cframe .c{color:#6b7280}.cframe .f{color:#7dd3fc}
+  .dbtable{width:100%;border-collapse:collapse;font:11.5px/1.5 "JetBrains Mono";margin-top:10px}
+  .dbtable th{color:var(--muted);text-align:left;border-bottom:1px solid var(--line);padding:5px 8px;font-weight:600}
+  .dbtable td{padding:5px 8px;border-bottom:1px solid #1c1c22;color:#c9c9d1;white-space:nowrap}
+  .dbtable tr.new td{background:#141a0e;color:var(--lime)}
+  .mailcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+  .mailcard .mh{font:600 .72rem "JetBrains Mono";color:var(--muted);margin-bottom:2px}
+  .mailcard .ms{font:700 .9rem "Space Grotesk";margin:6px 0 4px}
+  .mailcard .mb{font-size:.8rem;color:var(--muted)}
+  .okpanel{border:1px solid var(--lime);background:#141a0e;border-radius:12px;padding:22px;text-align:center}
+  .okpanel .big{font:700 1.3rem "Space Grotesk";color:var(--lime)}
+  .okpanel p{color:var(--muted);font-size:.85rem;margin:.4em 0 0}
+  .avstack2{display:flex;flex-direction:column;gap:12px}
+
+  /* S13 servisi */
+  .svc{cursor:pointer;position:relative}
+  .svc .svcback{display:none}
+  .svc.flipped{border-color:var(--lime)}
+  .svc.flipped .svcfront{display:none}
+  .svc.flipped .svcback{display:block;color:#cde59d}
+  .svc::after{content:"↺ open source?";position:absolute;top:14px;right:16px;font:600 .64rem "Space Grotesk";letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .svc.flipped::after{content:"↺ nazaj";color:var(--lime)}
+  .svc h3{padding-right:96px}
+
+  /* S14 metoda */
+  .pipe{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+  .pnode{border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:8px 12px;font:600 .78rem "Space Grotesk";color:var(--muted);white-space:nowrap;transition:all .3s;cursor:pointer}
+  .pnode.done{border-color:#3d4a2a;color:var(--text)}
+  .pnode.now{background:var(--lime);color:var(--ink);border-color:var(--lime)}
+  .stagecard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px 26px;min-height:220px}
+  .stagecard h3{color:var(--lime);font-size:1.25rem;margin-bottom:8px}
+  .stagecard .cmd{display:inline-block;font:600 .8rem "JetBrains Mono";background:#0f0f12;border:1px solid var(--line);border-radius:7px;padding:4px 10px;margin:0 0 12px;color:#d6f5a3}
+  .stagecard p{margin:0;color:var(--muted);max-width:580px}
+  .stagecard .human{margin-top:14px;font:600 .8rem "Space Grotesk";color:var(--lime)}
+
+  /* S13 lestev */
+  .ladder{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+  .rung{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0;position:relative}
+  .rung .lvl{font:700 2rem "Space Grotesk";color:var(--line)}
+  .rung h3{font-size:1rem;margin:4px 0 8px}
+  .rung p{font-size:.82rem;color:var(--muted);margin:0}
+  .rung .share{margin-top:14px}
+  .rung .share .lbl{font:600 .66rem "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .rung .share .bar{height:8px;background:#26262c;border-radius:999px;overflow:hidden;margin-top:5px}
+  .rung .share .you{height:100%;background:var(--lime);border-radius:999px}
+  .rung.here{border-color:var(--lime)}
+  .rung.here::after{content:"vidva sta tukaj";position:absolute;top:-11px;left:14px;background:var(--lime);color:var(--ink);font:700 .68rem "Space Grotesk";padding:3px 10px;border-radius:999px}
+
+  /* S14 naročnine */
+  .tree{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+  .plan .price{font:700 1.7rem "Space Grotesk";color:var(--lime)}
+  .plan h3{font-size:.95rem;margin:6px 0 8px}
+  .plan p{font-size:.83rem;color:var(--muted);margin:0}
+  .plan.reco{border-color:var(--lime);position:relative}
+  .plan.reco::after{content:"start za vaju";position:absolute;top:-11px;left:14px;background:var(--lime);color:var(--ink);font:700 .68rem "Space Grotesk";padding:3px 10px;border-radius:999px}
+
+  /* S15 ponedeljek */
+  .todo{counter-reset:t;list-style:none;padding:0;margin:0;max-width:640px}
+  .todo li{position:relative;padding:0 0 20px 52px;counter-increment:t;color:var(--muted)}
+  .todo li b{color:var(--text)}
+  .todo li::before{content:counter(t);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--lime);color:var(--ink);font:700 .95rem "Space Grotesk";display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+
+<!-- 1 NASLOVNICA -->
+<section class="slide active" id="s0">
+  <div class="coverbg"></div>
+  <div class="kicker">NativeAI · interni onboarding</div>
+  <h1>Kako <span class="lime">delamo.</span></h1>
+  <p class="sub" style="margin-top:16px">Prihodnost digitalnega dela, orodje, s katerim jo živimo, in metoda, po kateri gradimo. Vse, kar se danes naučita, je hkrati tudi to, kar prodajamo.</p>
+  <p><span class="tag">za Andraža in Leona</span> <span class="tag">← → za navigacijo</span> <span class="tag">slajdi so interaktivni, klikaj</span></p>
+</section>
+
+<!-- 2 RAZCEP DELA -->
+<section class="slide">
+  <div class="kicker">01 · izhodišče</div>
+  <h2>Delo se deli na dvoje.</h2>
+  <p class="sub">Vse človeško delo je premikanje snovi ali premikanje informacij. To je celotna delitev.</p>
+  <div class="split">
+    <div class="half phys">
+      <img class="halfimg" src="img/physical.jpg" alt="Robotska roka zlaga škatle">
+      <h3>Fizično delo</h3>
+      <span class="who">prevzemajo roboti</span><br>
+      <span class="chip">🏗️ gradnja</span><span class="chip">📦 prenašanje</span><span class="chip">🔧 popravila</span><span class="chip">🍳 kuhanje</span><span class="chip">🚚 vožnja</span><span class="chip">🧹 čiščenje</span>
+      <div class="verdict">Snov se premika s silo in energijo.</div>
+    </div>
+    <div class="half digi">
+      <img class="halfimg" src="img/digital.jpg" alt="Digitalna roka pretvarja dokumente v podatke">
+      <h3>Digitalno delo</h3>
+      <span class="who">prevzema AI</span><br>
+      <span class="chip">✉️ e-pošta</span><span class="chip">📊 tabele</span><span class="chip">📄 dokumenti</span><span class="chip">🎨 dizajn</span><span class="chip">💻 koda</span><span class="chip">📈 poročila</span><span class="chip">🧾 računi</span><span class="chip">📅 plani</span>
+      <div class="verdict">Informacije se berejo, premislijo in zapišejo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 ZANKA -->
+<section class="slide">
+  <div class="kicker">02 · digitalno delo od blizu</div>
+  <h2>Vsako digitalno opravilo je ista zanka.</h2>
+  <p class="sub">Zaznaj informacijo, premisli, ukrepaj. Mail, ponudba, analiza, objava: vedno ta krog.</p>
+  <div class="loopstage">
+    <div class="loop">
+      <div class="ring"></div>
+      <div class="ball"></div>
+      <div class="stop a">👁️ zaznaj</div>
+      <div class="stop b">🧠 premisli</div>
+      <div class="stop c">✍️ ukrepaj</div>
+    </div>
+    <div class="min-w-0">
+      <div class="looptabs" id="looptabs">
+        <button class="ltab on" onclick="loopEx(0,this)">✉️ Podpora</button>
+        <button class="ltab" onclick="loopEx(1,this)">🎨 Dizajn</button>
+        <button class="ltab" onclick="loopEx(2,this)">📈 Marketing</button>
+        <button class="ltab" onclick="loopEx(3,this)">🤝 Prodaja</button>
+      </div>
+      <div class="artifact" id="loopartifact">
+        <b>Vhod:</b> <span id="lex-in">»Pozdravljeni, zanima me cena za oktober ...«</span><br><br>
+        <b>Premislek:</b> <span id="lex-think">kdo sprašuje, kaj imamo, kakšna je cena, kakšen ton</span><br><br>
+        <b>Izhod:</b> <span class="out" id="lex-out">»Spoštovani, oktobrski termin je še prost, cena je ...«</span>
+      </div>
+      <p class="sub" style="margin-top:16px">Isto zanko ves dan vrti vsak, ki dela za ekranom; razlikuje se samo, kaj bere in kaj ustvari. Preklopi med poklici in poglej.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3B RAČUNALNIK -->
+<section class="slide">
+  <div class="kicker">03 · ključno spoznanje</div>
+  <h2>AI upravlja računalnik tako kot mi.</h2>
+  <p class="sub">Računalnik upravljamo na dva načina: z miško in tipkovnico po ekranu, ali prek terminala, kjer vpišeš ukaz in se stvar izvede. Claude Code, Codex in Cursor imajo dostop do terminala in te ukaze poznajo.</p>
+  <div class="ctrlgrid">
+    <div class="card">
+      <p class="avcap">način 1 · miška in tipkovnica</p>
+      <div class="bframe">
+        <div class="bbar"><span class="bdot"></span><span class="bdot"></span><span class="bdot"></span><span class="burl">Finder · Dokumenti</span></div>
+        <div class="bbody" style="padding:14px 18px">
+          <div class="fico">📄 ponudba.pdf</div>
+          <div class="fico sel">📊 stranke.xlsx<span class="cursor" style="right:-6px;bottom:-8px">🖱️</span></div>
+          <div class="fico">🖼️ logo.png</div>
+        </div>
+      </div>
+      <p class="sub" style="font-size:.82rem;margin:10px 0 0">Ekran je frontend računalnika: klikaš, vlečeš, tipkaš. Tako delamo ljudje.</p>
+    </div>
+    <div class="card">
+      <p class="avcap">način 2 · terminal (ukazi)</p>
+      <div class="cframe">
+        <div class="cbar">terminal</div>
+        <pre>$ ls Dokumenti
+ponudba.pdf   stranke.xlsx   logo.png
+$ open ponudba.pdf
+$ python analiza.py --mesec julij
+<span class="s">✓ poročilo shranjeno: julij-porocilo.html</span></pre>
+      </div>
+      <p class="sub" style="font-size:.82rem;margin:10px 0 0">Isti računalnik, brez klikanja: vpišeš ukaz, stvar se zgodi. Tako dela AI, zato je lahko tako hiter.</p>
+    </div>
+  </div>
+  <p class="sub" style="margin:22px 0 12px">To velja za vse, kar je <b class="lime">na računalniku</b>: datoteke, programi, skripte. Splet je druga zgodba: stran lahko odpre, za klikanje po njej pa rabi posebna vrata (slajd 07). Do zunanjih orodij pa AI pride po treh poteh:</p>
+  <div class="grid">
+    <div class="card"><h3 style="font-size:.95rem">⌨️ CLI</h3><p class="sub" style="font-size:.82rem;margin:6px 0 0">Ukazna vrstica orodja: agent tipka ukaze, kot bi jih ti v terminal.</p></div>
+    <div class="card"><h3 style="font-size:.95rem">🔌 MCP</h3><p class="sub" style="font-size:.82rem;margin:6px 0 0">Standardni vtič, narejen prav za AI: orodje se agentu samo predstavi in ga zna takoj uporabljati.</p></div>
+    <div class="card"><h3 style="font-size:.95rem">🌐 API</h3><p class="sub" style="font-size:.82rem;margin:6px 0 0">Strojni vmesnik storitve: agent pošilja zahteve neposredno, brez ekrana vmes.</p></div>
+  </div>
+</section>
+
+<!-- 4 AI PREVZAME -->
+<section class="slide">
+  <div class="kicker">04 · kaj se je zgodilo</div>
+  <h2>AI to zanko že vrti, in to hitreje.</h2>
+  <p class="sub">To ni »nekoč«, ampak zdaj: na tvojem računalniku, na tvojih datotekah. Pritisni start.</p>
+  <div class="racelane">
+    <div class="lane" id="laneH">
+      <div class="lbl">človek · 40 neodgovorjenih mailov</div>
+      <div class="track"><div class="run" id="runH"></div></div>
+    </div>
+    <div class="lane ai" id="laneA">
+      <div class="lbl">AI z dostopom in kontekstom · istih 40 mailov (osnutki, ti potrdiš)</div>
+      <div class="track"><div class="run" id="runA"></div></div>
+    </div>
+  </div>
+  <div class="btnrow"><button class="primary" onclick="race()">▶ start</button></div>
+  <p class="sub" style="margin-top:18px" id="raceverdict"></p>
+</section>
+
+<!-- 5 ZAPOSLITEV -->
+<section class="slide">
+  <div class="kicker">05 · ključni preskok v glavi</div>
+  <h2>Ne naložiš ga, ampak ga zaposliš.</h2>
+  <p class="sub">Nov sodelavec prvi dan dobi štiri stvari. AI rabi popolnoma iste štiri, samo mize in plače ne. Klikni vsako režo.</p>
+  <img class="banner" src="img/onboarding.jpg" alt="Človek predaja dostop digitalnemu sodelavcu na vratih">
+
+  <div class="slots">
+    <div class="slot" onclick="this.classList.toggle('onn')"><span class="ico">🔑</span><h3>Dostopi</h3><p>računi in orodja, do katerih sme (MCP, API, CLI)</p></div>
+    <div class="slot" onclick="this.classList.toggle('onn')"><span class="ico">📖</span><h3>Navodila</h3><p>kako pri nas delamo: pravila, postopki, standardi</p></div>
+    <div class="slot" onclick="this.classList.toggle('onn')"><span class="ico">🧠</span><h3>Kontekst</h3><p>znanje o firmi: ponudba, stranke, cene, ton</p></div>
+    <div class="slot" onclick="this.classList.toggle('onn')"><span class="ico">✅</span><h3>Pregled</h3><p>prve mesece nič ne gre ven brez tvojega pogleda</p></div>
+  </div>
+  <p class="sub" style="margin-top:20px">Večina podjetij nima zapisane niti ene od teh štirih stvari. Točno tam je najin posel.</p>
+</section>
+
+<!-- 6 KONTEKST STIKALO -->
+<section class="slide">
+  <div class="kicker">06 · ozko grlo št. 1</div>
+  <h2>AI je isti, razliko prinese kontekst.</h2>
+  <p class="sub">Modele imajo vsi iste. Preklopi stikalo in glej edino spremenljivko, ki šteje. Isti poklici kot prej: preklapljaj.</p>
+  <div class="looptabs">
+    <button class="ltab ctab on" onclick="ctxEx(0,this)">✉️ Podpora</button>
+    <button class="ltab ctab" onclick="ctxEx(1,this)">🎨 Dizajn</button>
+    <button class="ltab ctab" onclick="ctxEx(2,this)">📈 Marketing</button>
+    <button class="ltab ctab" onclick="ctxEx(3,this)">🤝 Prodaja</button>
+  </div>
+  <div class="ctxwrap" id="ctxroot">
+    <div>
+      <div class="promptcard">
+        <div class="label">prompt (obakrat identičen)</div>
+        <p id="cx-prompt">Napiši follow-up mail kliniki, ki je včeraj spraševala po ceni.</p>
+      </div>
+      <div class="switchrow">
+        <div class="switch" onclick="toggleCtx()" role="switch" aria-label="kontekst podjetja"></div>
+        <span class="switchlbl" id="ctxlbl">kontekst podjetja: IZKLOPLJEN</span>
+      </div>
+      <div class="ctxfiles" id="cx-files"></div>
+    </div>
+    <div class="outcard">
+      <span class="stamp bad">generična solata</span>
+      <span class="stamp good" id="cx-goodstamp">pripravljeno za pošiljanje</span>
+      <div class="out generic" id="cx-gen"></div>
+      <div class="out grounded" id="cx-gnd"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 TROJE VRAT -->
+<section class="slide">
+  <div class="kicker">07 · ozko grlo št. 2</div>
+  <h2>Troje vrat do tvojih orodij.</h2>
+  <p class="sub">AI mora do orodij, ki jih že uporabljaš. Tri poti, tri hitrosti. Opazuj pretok podatkov.</p>
+  <div class="doors">
+    <div class="door d1">
+      <h3>🔑 Glavna vrata</h3><span class="spd">API · MCP · CLI · hitro in zanesljivo</span>
+      <div class="flowtrack"><span class="p"></span><span class="p p2"></span><span class="p p3"></span></div>
+      <p>Uradni priklop, zgrajen za ta namen. Novo merilo pri izbiri KATEREGAKOLI softvera: ima vtičnico za agente?</p>
+    </div>
+    <div class="door d2">
+      <h3>🚪 Stranski vhod</h3><span class="spd">brskalnik (Playwright) · počasneje</span>
+      <div class="flowtrack"><span class="p"></span><span class="p p2"></span></div>
+      <p>AI klika po spletni strani kot človek. Deluje skoraj povsod, a počasneje, poleg tega se stran lahko spremeni ali brani (zaznavanje botov).</p>
+    </div>
+    <div class="door d3">
+      <h3>🖱️ Pantomima</h3><span class="spd">computer use · zadnja izbira</span>
+      <div class="flowtrack"><span class="p"></span></div>
+      <p>AI gleda ekran in premika miško. Načeloma odpre vse, danes pa je počasno in okorno. Je rezerva, ne prvi izbor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 PRAZNA SOBA -->
+<section class="slide">
+  <div class="kicker">08 · varnost brez strahu</div>
+  <h2>Začne brez moči. Vrata odpiraš ti.</h2>
+  <p class="sub">AI ne pride z dostopom do tvojega denarja ali strank. Dobi samo tisto, kar mu izrecno priklopiš. Klikni dostope in glej, kaj se odklene.</p>
+  <div class="roomwrap">
+    <div class="grants">
+      <div class="grant" onclick="grant(this,'mail')"><span class="box"></span> priklopi e-pošto</div>
+      <div class="grant" onclick="grant(this,'cal')"><span class="box"></span> priklopi koledar</div>
+      <div class="grant" onclick="grant(this,'files')"><span class="box"></span> priklopi datoteke</div>
+      <div class="grant" onclick="grant(this,'deploy')"><span class="box"></span> priklopi strežnik</div>
+      <p class="sub" style="font-size:.8rem;margin-top:6px">Banke ni na seznamu. Ta vrata ne obstajajo, razen če bi jih kdo namerno zgradil. Nihče pameten jih ne.</p>
+    </div>
+    <div class="room" id="room">
+      <div class="empty" id="roomempty">prazna soba: brez priklopov AI ne more storiti ničesar v tvojem svetu</div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 MIZA -->
+<section class="slide">
+  <div class="kicker">09 · zakaj seje »oslabijo«</div>
+  <h2>Miza: delovni spomin AI-ja.</h2>
+  <p class="sub">Vse, s čimer AI trenutno dela, leži na eni mizi (context window). Natrpana miza pomeni slabše delo, čisto kot pri ljudeh. Rešitev ni večja miza, ampak stranska miza.</p>
+  <div class="meter" id="meter"><span class="lbl">kakovost outputa</span><div class="bar"><div class="fill" id="fill"></div></div><span class="pct" id="pct">96%</span></div>
+  <div class="deskstage">
+    <div class="desk" id="desk">
+      <span class="paper core">tvoja naloga: napiši ponudbo</span>
+      <span class="paper core">CLAUDE.md</span>
+    </div>
+    <div class="sidedesk" id="sidedesk"></div>
+  </div>
+  <div class="btnrow">
+    <button onclick="addWork()">+ vrzi 40 strani PDF-ja na mizo</button>
+    <button class="primary" onclick="delegate()">pošlji na stransko mizo</button>
+    <button onclick="resetDesk()">ponastavi</button>
+  </div>
+</section>
+
+<!-- 10 ANATOMIJA -->
+<section class="slide anat">
+  <div class="kicker">10 · Claude Code od znotraj</div>
+  <h2>Sedem delov, ena družina metafor.</h2>
+  <p class="sub">To je celoten sistem prilagajanja. Vse ostalo so podrobnosti.</p>
+  <div class="grid">
+    <div class="card"><span class="ico">🗄️</span><h3>Miza</h3><span class="en">context window</span><p>Delovni spomin seje. Prejšnji slajd. Vse spodaj obstaja zato, da miza ostane čista.</p></div>
+    <div class="card"><span class="ico">📖</span><h3>Priročnik</h3><span class="en">CLAUDE.md</span><p>Prebere ga na začetku vsake seje, samodejno. Kar dvakrat razlagaš, zapiši enkrat sem in nikoli več.</p></div>
+    <div class="card"><span class="ico">📋</span><h3>Playbooki</h3><span class="en">skills</span><p>Kontrolni list za določeno opravilo, dela ga s tabo. Primer: skill za račune, ki pozna naše številčenje in predlogo. Kličeš z <b>/ime</b>.</p></div>
+    <div class="card"><span class="ico">🪑</span><h3>Stranske mize</h3><span class="en">agents · subagents</span><p>Sodelavec s svojo mizo. Umazanija ostane pri njem, k tebi pride ena čista kartica povzetka.</p></div>
+    <div class="card"><span class="ico">⛔</span><h3>Tripwiri</h3><span class="en">hooks</span><p>Hišna pravila, ki jih vsiljuje stavba, ne vljudnost delavca. Fizično blokirajo nevarno dejanje, tudi ob treh zjutraj.</p></div>
+    <div class="card"><span class="ico">📦</span><h3>Selitvene škatle</h3><span class="en">plugins</span><p>Priročnik, playbooki in pravila v eni škatli, ki se namesti z enim klikom. Tako se cel setup preseli k novi osebi ali stranki.</p></div>
+    <div class="card"><span class="ico">🔌</span><h3>USB vtičnice</h3><span class="en">MCP</span><p>Standardni vtič, ki poveže orodja z AI-jem. Naslednji slajd: kaj vtakneva midva.</p></div>
+  </div>
+</section>
+
+<!-- 11 PRIKLOPI -->
+<section class="slide conn">
+  <div class="kicker">11 · vajin setup</div>
+  <h2>Kaj priklopita in kaj s tem dobita.</h2>
+  <p class="sub">Vsaka kartica: orodje, pot in kaj AI z njim zmore. Točni ukazi so v guidu, ki ga dobita zraven.</p>
+  <div class="grid">
+    <div class="card"><h3>🗂️ NativeAI OS <span class="tag">dan 1</span></h3>
+      <div class="mini"><span class="n">seja se začne</span><span class="a">→</span><span class="n">vidi tvoje taske</span><span class="a">→</span><span class="n">zaključi z opombo</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Ekipni pregled kdo-dela-kaj, brez sestankov.</p></div>
+    <div class="card"><h3>🌐 Playwright <span class="tag">dan 1</span></h3>
+      <div class="mini"><span class="n">odpre stran</span><span class="a">→</span><span class="n">klika in bere</span><span class="a">→</span><span class="n">screenshot za dokaz</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Stranski vhod do vsega brez vtičnice + preverjanje lastnega dela.</p></div>
+    <div class="card"><h3>🚀 Dokploy <span class="tag">dan 1</span></h3>
+      <div class="mini"><span class="n">zgradi stran</span><span class="a">→</span><span class="n">push</span><span class="a">→</span><span class="n you">živ URL</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Delo se ne konča kot datoteka, ampak kot živa stvar na netu.</p></div>
+    <div class="card"><h3>📚 Context7 <span class="tag">dan 1</span></h3>
+      <div class="mini"><span class="n">kodira</span><span class="a">→</span><span class="n">potegne svežo dokumentacijo</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Namesto ugibanja iz zastarelega spomina.</p></div>
+    <div class="card"><h3>✉️ Gmail + koledar <span class="tag">teden 1</span></h3>
+      <div class="mini"><span class="n">prebere predal</span><span class="a">→</span><span class="n">pripravi osnutke</span><span class="a">→</span><span class="n you">ti pošlješ</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Osnutki vedno, pošiljanje nikoli brez tebe.</p></div>
+    <div class="card"><h3>💬 Discord <span class="tag">dan 1</span></h3>
+      <div class="mini"><span class="n">ekipni chat</span><span class="a">→</span><span class="n">bot bere in objavlja</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Kamor AI javi, kaj je shipnil.</p></div>
+    <div class="card"><h3>📇 Twenty CRM <span class="tag">ob GTM delu</span></h3>
+      <div class="mini"><span class="n">lead</span><span class="a">→</span><span class="n">zapis + follow-up osnutek</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Evidenca ostane poštena po vsakem klicu.</p></div>
+    <div class="card"><h3>🎨 Codex · image gen <span class="tag">ob contentu</span></h3>
+      <div class="mini"><span class="n">opišeš sliko</span><span class="a">→</span><span class="n">render v visoki kvaliteti</span><span class="a">→</span><span class="n you">slika za objavo ali deck</span></div>
+      <p class="sub" style="font-size:.8rem;margin:8px 0 0">Vse slike v tej prezentaciji so narejene z njim.</p></div>
+  </div>
+</section>
+
+<!-- 12 SPLETNA APLIKACIJA -->
+<section class="slide">
+  <div class="kicker">12 · pod pokrovom</div>
+  <h2>Kako je sestavljena spletna aplikacija.</h2>
+  <p class="sub">Vsaka aplikacija, ki jo bosta kdaj zgradila, ima iste tri sloje. Klikni »pošlji zahtevo« in spremljaj pot enega klika.</p>
+  <div class="applayout">
+    <div>
+      <div class="appstack" id="appstack">
+        <div class="layer" data-l="0"><span class="lico">🧑</span><div class="min-w-0"><h3>Uporabnik</h3><p>klikne »Rezerviraj termin«</p></div></div>
+        <div class="ldown">↓</div>
+        <div class="layer" data-l="1"><span class="lico">🖥️</span><div class="min-w-0"><h3>Frontend</h3><p>kar uporabnik vidi: strani, gumbi, obrazci (HTML, CSS, JS)</p></div></div>
+        <div class="ldown">↓</div>
+        <div class="layer" data-l="2"><span class="lico">⚙️</span><div class="min-w-0"><h3>Backend</h3><p>logika v ozadju: preveri, izračuna, odloči, kaj se sme</p></div></div>
+        <div class="ldown">↓</div>
+        <div class="layer" data-l="3"><span class="lico">🗃️</span><div class="min-w-0"><h3>Baza podatkov</h3><p>spomin aplikacije: podatki obstanejo tudi, ko zapreš stran</p></div></div>
+      </div>
+      <div class="card" style="margin-top:14px"><p style="margin:0;font-size:.9rem" id="appexpl" class="sub">Pritisni gumb in poglej, kaj se v resnici zgodi ob enem kliku.</p></div>
+      <div class="btnrow"><button class="primary" onclick="appStep()" id="appbtn">▶ pošlji zahtevo</button><button onclick="appReset()">ponastavi</button></div>
+    </div>
+    <div class="appview">
+
+      <div class="av on" id="av0">
+        <p class="avcap">zaslon · to vidi uporabnik</p>
+        <div class="bframe">
+          <div class="bbar"><span class="bdot"></span><span class="bdot"></span><span class="bdot"></span><span class="burl">vetklinika-novak.si/rezervacija</span></div>
+          <div class="bbody">
+            <div class="formrow"><div class="flbl">Storitev</div><div class="fval">Pregled psa</div></div>
+            <div class="formrow"><div class="flbl">Termin</div><div class="fval">četrtek, 10.00</div></div>
+            <span class="bbtn">Rezerviraj termin<span class="cursor">🖱️</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="av" id="av1">
+        <p class="avcap">koda · frontend ta klik spremeni v zahtevo</p>
+        <div class="cframe">
+          <div class="cbar">rezervacija.js</div>
+          <pre><span class="c">// gumb na strani</span>
+&lt;button onclick=<span class="s">"rezerviraj()"</span>&gt;
+  Rezerviraj termin
+&lt;/button&gt;
+
+<span class="k">async function</span> <span class="f">rezerviraj</span>() {
+  <span class="k">await</span> <span class="f">fetch</span>(<span class="s">'/api/rezervacije'</span>, {
+    method: <span class="s">'POST'</span>,
+    body: { termin: <span class="s">'čet 10.00'</span>, storitev: <span class="s">'pregled psa'</span> }
+  })
+}</pre>
+        </div>
+      </div>
+
+      <div class="av" id="av2">
+        <p class="avcap">koda · backend odloča, kaj se sme</p>
+        <div class="cframe">
+          <div class="cbar">api/rezervacije.js</div>
+          <pre><span class="c">// logika, ki je uporabnik nikoli ne vidi</span>
+<span class="k">if</span> (!uporabnik.prijavljen)      <span class="k">return</span> <span class="f">zavrni</span>()
+<span class="k">if</span> (!<span class="f">terminProst</span>(<span class="s">'čet 10.00'</span>)) <span class="k">return</span> <span class="f">zavrni</span>()
+
+<span class="f">shrani</span>(rezervacija)          <span class="c">// → baza podatkov</span>
+<span class="f">posljiPotrditev</span>(uporabnik)   <span class="c">// → servis za maile</span></pre>
+        </div>
+      </div>
+
+      <div class="av" id="av3">
+        <p class="avcap">baza · podatek se trajno zapiše</p>
+        <div class="cframe">
+          <div class="cbar">baza podatkov · tabela rezervacije</div>
+          <pre><span class="k">INSERT INTO</span> rezervacije (stranka, termin, storitev)
+<span class="k">VALUES</span> (<span class="s">'Novak'</span>, <span class="s">'čet 10.00'</span>, <span class="s">'pregled psa'</span>);</pre>
+        </div>
+        <table class="dbtable">
+          <tr><th>id</th><th>stranka</th><th>termin</th><th>storitev</th></tr>
+          <tr><td>41</td><td>Kovač</td><td>pet 9.00</td><td>cepljenje</td></tr>
+          <tr class="new"><td>42</td><td>Novak</td><td>čet 10.00</td><td>pregled psa</td></tr>
+        </table>
+      </div>
+
+      <div class="av" id="av4">
+        <p class="avcap">servis · aplikacija ne pošilja sama, servis pošlje zanjo</p>
+        <div class="avstack2">
+          <div class="cframe">
+            <div class="cbar">backend → servis za maile (en API klic)</div>
+            <pre>resend.<span class="f">send</span>({ to: <span class="s">'novak@gmail.com'</span>, subject: <span class="s">'Rezervacija potrjena'</span> })</pre>
+          </div>
+          <div class="mailcard">
+            <div class="mh">Od: Veterinarska klinika Novak</div>
+            <div class="mh">Za: novak@gmail.com</div>
+            <div class="ms">Rezervacija potrjena ✓</div>
+            <div class="mb">Vaš termin: četrtek ob 10.00, pregled psa. Se vidimo!</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="av" id="av5">
+        <p class="avcap">zaslon · uporabnik vidi samo rezultat</p>
+        <div class="bframe">
+          <div class="bbar"><span class="bdot"></span><span class="bdot"></span><span class="bdot"></span><span class="burl">vetklinika-novak.si/rezervacija</span></div>
+          <div class="bbody">
+            <div class="okpanel"><div class="big">✓ Rezervirano</div><p>četrtek ob 10.00 · potrditev je v vašem mailu</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 13 SERVISI + OPEN SOURCE -->
+<section class="slide conn">
+  <div class="kicker">13 · servisi in open source</div>
+  <h2>Aplikacija skoraj nikoli ne stoji sama.</h2>
+  <p class="sub">Za maile, prijavo uporabnikov ali plačila ne pišeš svoje rešitve, priklopiš servis. Klikni kartico in poglej odprtokodno alternativo, ki jo lahko poganjaš na svojem strežniku.</p>
+  <div class="grid">
+    <div class="card svc" onclick="this.classList.toggle('flipped')"><h3>📧 Pošiljanje mailov</h3><p class="sub svcfront" style="font-size:.84rem;margin:6px 0 0">Da aplikacija sama pošlje potrditev ali obvestilo: servis tipa Resend ali AWS SES, priklopljen z enim API ključem.</p><p class="sub svcback" style="font-size:.84rem;margin:6px 0 0">Open source: lasten SMTP je mazohizem; tu se servis navadno splača. Naša izbira: Resend.</p></div>
+    <div class="card svc" onclick="this.classList.toggle('flipped')"><h3>👤 Uporabniki (auth)</h3><p class="sub svcfront" style="font-size:.84rem;margin:6px 0 0">Registracija, prijava, gesla, seje. Nikoli ne izumljaš sam, vzameš preverjeno rešitev.</p><p class="sub svcback" style="font-size:.84rem;margin:6px 0 0">Open source: Better Auth (uporabljamo v CoachMeAI stacku) ali Keycloak, oba na svojem strežniku.</p></div>
+    <div class="card svc" onclick="this.classList.toggle('flipped')"><h3>💳 Plačila</h3><p class="sub svcfront" style="font-size:.84rem;margin:6px 0 0">Kartice, naročnine, računi: Stripe. Aplikacija dobi signal »plačano je«, ostalo uredi servis.</p><p class="sub svcback" style="font-size:.84rem;margin:6px 0 0">Open source: pri denarju alternativa ni smiselna; regulativa in zaupanje sta Stripov posel.</p></div>
+    <div class="card svc" onclick="this.classList.toggle('flipped')"><h3>🗄️ Datoteke</h3><p class="sub svcfront" style="font-size:.84rem;margin:6px 0 0">Slike, PDF-ji, uploadi: object storage (S3 in podobno), ne mapa na strežniku.</p><p class="sub svcback" style="font-size:.84rem;margin:6px 0 0">Open source: MinIO na lastnem VPS govori isti S3 jezik.</p></div>
+    <div class="card svc" onclick="this.classList.toggle('flipped')"><h3>📊 Analitika</h3><p class="sub svcfront" style="font-size:.84rem;margin:6px 0 0">Kdo pride, od kod, kaj klikne. Brez tega letiš na slepo.</p><p class="sub svcback" style="font-size:.84rem;margin:6px 0 0">Open source: Umami ali Plausible na svojem strežniku, brez piškotkov in brez Googla.</p></div>
+    <div class="card" style="border-color:#3d4a2a"><h3>🧩 Naš živi primer: Twenty CRM</h3>
+      <div class="mini"><span class="n">open source CRM</span><span class="a">→</span><span class="n">teče na našem VPS</span><span class="a">→</span><span class="n you">AI ima MCP dostop</span></div>
+      <p class="sub" style="font-size:.84rem;margin:8px 0 0">Namesto plačljivega CRM-ja poganjamo odprtokodnega na svojem strežniku: naši podatki, nič mesečnine, in Claude ga upravlja prek vtičnice.</p></div>
+  </div>
+  <p class="sub" style="margin-top:18px">Poenostavljena resnica: <b class="lime">frontend + backend + baza + servisi.</b> Claude Code zna napisati in povezati vse štiri. Vajino delo je vedeti, KAJ hočeta, in preveriti, da dela.</p>
+</section>
+
+<!-- 14 METODA -->
+<section class="slide">
+  <div class="kicker">14 · metoda</div>
+  <h2>Ena zanka za vse, prikazana na vajini finalni nalogi.</h2>
+  <p class="sub">Naloga: landing page za NativeAI po zgledu terafab.ai. Prompt dobita gotov (vaja 6 v guidu); tukaj je, kaj se bo zgodilo po korakih. Limetini koraki so tisti, kjer si TI orodje.</p>
+  <div class="pipe" id="pipe"></div>
+  <div class="stagecard" id="stagecard"></div>
+  <div class="btnrow"><button class="primary" onclick="nextStage()">naslednji korak →</button><button onclick="stageIdx=0;renderStage()">od začetka</button></div>
+</section>
+
+<!-- 13 LESTEV -->
+<section class="slide">
+  <div class="kicker">15 · kje sta in kam gresta</div>
+  <h2>Štiri stopnice zrelosti.</h2>
+  <p class="sub">Zeleni del črte je, koliko dela opravi človek. Cilj ni stopnica 4 povsod, cilj je vedeti, na kateri stopnici je kateri workflow.</p>
+  <div class="ladder">
+    <div class="rung here"><span class="lvl">1</span><h3>Klepet</h3><p>Copy-paste v ChatGPT. AI kot slovar na steroidih.</p><div class="share"><span class="lbl">delež človeka</span><div class="bar"><div class="you" style="width:90%"></div></div></div></div>
+    <div class="rung"><span class="lvl">2</span><h3>Priklopljen</h3><p>AI bere tvoje sisteme: pošto, datoteke, koledar. Odgovori so o TVOJEM svetu.</p><div class="share"><span class="lbl">delež človeka</span><div class="bar"><div class="you" style="width:65%"></div></div></div></div>
+    <div class="rung"><span class="lvl">3</span><h3>Delegirano</h3><p>AI opravi nalogo, ti pregledaš in potrdiš. Tu se zgodi največji preskok produktivnosti.</p><div class="share"><span class="lbl">delež človeka</span><div class="bar"><div class="you" style="width:30%"></div></div></div></div>
+    <div class="rung"><span class="lvl">4</span><h3>Lastnik workflowa</h3><p>AI vodi cel proces, tebe pokliče samo ob izjemah. Ti postaviš pravila in meje.</p><div class="share"><span class="lbl">delež človeka</span><div class="bar"><div class="you" style="width:10%"></div></div></div></div>
+  </div>
+</section>
+
+<!-- 15 PONEDELJEK -->
+<section class="slide">
+  <div class="kicker">16 · začetek</div>
+  <h2>Kaj naredita ta teden.</h2>
+  <ol class="todo">
+    <li><b>Setup po guidu.</b> Claude Pro, desktop app, gh, starter CLAUDE.md, NativeAI OS token, Discord. Ura dela, enkrat za vedno.</li>
+    <li><b>Pet kratkih vaj iz guida.</b> Mapa, raziskava z viri, plan na boardu, stranska miza, ena shipnjena stran. Vsaka vzame minuto, vsaka pokaže en nosilen koncept.</li>
+    <li><b>Finalna naloga: landing page za NativeAI.</b> Prompt dobita gotov (vaja 6 v guidu): vajin Claude si ogleda to prezentacijo na spletu, analizira referenčno stran s Playwrightom in zgradi landing page v NativeAI dizajnu. Amadej pregleda rezultat, točno tako bomo onboardali stranke.</li>
+  </ol>
+  <p class="sub" style="margin-top:24px">In od prvega dne velja: <b class="lime">kar dvakrat razložiš, enkrat zapišeš.</b> Najbolje dokumentirana firma zmaga, tudi najina.</p>
+</section>
+
+<div class="hud">
+  <span class="hint">← →</span>
+  <div class="dots" id="dots"></div>
+  <div class="navbtns"><button onclick="go(-1)">←</button><button class="primary" onclick="go(1)">→</button></div>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];let cur=0;
+  const dots=document.getElementById('dots');
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>show(i);dots.appendChild(d)});
+  function show(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>s.classList.toggle('active',j===cur));[...dots.children].forEach((d,j)=>d.classList.toggle('on',j===cur));history.replaceState(null,'','#'+(cur+1));window.scrollTo(0,0)}
+  function go(d){show(cur+d)}
+  addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});
+  const h=parseInt(location.hash.slice(1),10);if(h>=1&&h<=slides.length)show(h-1);
+
+  // S3 zanka: primeri poklicev
+  const loopExs=[
+    {i:'»Pozdravljeni, zanima me cena za oktober ...«',t:'kdo sprašuje, kaj imamo, kakšna je cena, kakšen ton',o:'»Spoštovani, oktobrski termin je še prost, cena je ...«'},
+    {i:'»Rabimo vizual za novo kampanjo, do petka.«',t:'brand barve, sporočilo, formati za vsak kanal, reference iz swipe fila',o:'trije koncepti vizuala, izbrani izvožen za IG in LinkedIn'},
+    {i:'analitika zadnjega meseca: obiski, konverzije, top objave',t:'kaj je delovalo, kje odpade največ ljudi, kaj testirati naslednje',o:'plan objav za naslednji mesec + dva A/B testa'},
+    {i:'zapiski s klica s stranko',t:'potrebe, proračun, ugovori, kakšen je naslednji korak',o:'ponudba v PDF + follow-up mail, nastavljen čez tri dni'}
+  ];
+  function loopEx(i,btn){[...document.querySelectorAll('.ltab')].forEach(b=>b.classList.toggle('on',b===btn));const e=loopExs[i];document.getElementById('lex-in').textContent=e.i;document.getElementById('lex-think').textContent=e.t;document.getElementById('lex-out').textContent=e.o}
+
+  // S4 tekma
+  function race(){
+    const h=document.getElementById('runH'),a=document.getElementById('runA');
+    document.getElementById('laneH').classList.remove('go');document.getElementById('laneA').classList.remove('go');
+    h.style.width='0%';a.style.width='0%';document.getElementById('raceverdict').textContent='';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.getElementById('laneH').classList.add('go');document.getElementById('laneA').classList.add('go');
+      h.style.width='100%';a.style.width='100%';
+      setTimeout(()=>{document.getElementById('raceverdict').innerHTML='AI konča v minutah, človek v popoldnevu. Ampak pozor: AI-jevi so <b class="lime">osnutki</b>. Zadnji klik je ostal človeški, in točno to je prava slika.'},700);
+    }));
+  }
+
+  // S6 kontekst
+  function toggleCtx(){const r=document.getElementById('ctxroot');r.classList.toggle('ctx-on');document.getElementById('ctxlbl').textContent='kontekst podjetja: '+(r.classList.contains('ctx-on')?'VKLOPLJEN':'IZKLOPLJEN')}
+  const ctxExs=[
+   {prompt:'Napiši follow-up mail kliniki, ki je včeraj spraševala po ceni.',good:'pripravljeno za pošiljanje',
+    files:[['ponudba.md','pilot 290 €, kavcija 100 €, 14-dnevni preizkus'],['klinika.md','dr. Novak, veterina, spraševal po odzivnem času'],['ton.md','direktno, brez marketinškega leporečja, vikanje']],
+    gen:['Spoštovani,','upam, da vas ta e-pošta najde v dobrem stanju! Najlepša hvala za vaše zanimanje za naše inovativne rešitve umetne inteligence. Ponujamo širok nabor naprednih storitev, prilagojenih vašim edinstvenim potrebam ...','Ne oklevajte in nas kontaktirajte za dodatna vprašanja!'],
+    gnd:['Spoštovani dr. Novak,','hvala za včerajšnje vprašanje glede cene. Konkretno: pilot stane <span class="hl">290 €</span>, rezervacija termina je <span class="hl">100 € povračljive kavcije</span>, in če sistem v <span class="hl">14 dneh</span> ne prestane preizkusa v živo, ne plačate nič.','Ker vas je zanimal odzivni čas: vaš predal pregledamo in osnutke pripravimo <span class="hl">v minutah, ne urah</span>. V četrtek ob 10h vam pokažem na vaših primerih?']},
+   {prompt:'Pripravi vizual za objavo o naši novi storitvi.',good:'v brandu, pripravljeno',
+    files:[['brand.md','limeta #BEF264 na skoraj črni, Space Grotesk, brez gradientov'],['storitev.md','AI recepcija: odgovarja gostom 24/7, launch 1. 8.'],['formati.md','IG 1080×1350, LinkedIn 1200×627 + tri najboljše pretekle objave']],
+    gen:['Predlagam moderen dizajn: modro-vijoličen gradient, robot z žarnico in napis »Inovacija prihaja! 🚀«.','Naj dodam še stock fotografijo rokovanja in QR kodo?'],
+    gnd:['Koncept: skoraj črna podlaga, limetin naslov <span class="hl">»Recepcija, ki nikoli ne spi.«</span>, pod njim en stavek o odgovorih 24/7. Space Grotesk, brez ikon in gradientov, po vzoru vaših treh najboljših objav.','Izvoženo v <span class="hl">1080×1350 za IG</span> in <span class="hl">1200×627 za LinkedIn</span>, pripravljeno za launch 1. 8.']},
+   {prompt:'Napiši LinkedIn objavo o naši novi storitvi.',good:'pripravljeno za objavo',
+    files:[['icp.md','direktorji butičnih hotelov, 10 do 40 sob, Slovenija'],['glas.md','prva oseba, konkretno, nič hashtag zidov in emoji solate'],['dokazi.md','pilot: 38 % manj neodgovorjenih povpraševanj v 14 dneh']],
+    gen:['🚀 Z veseljem sporočamo, da lansiramo revolucionarno AI rešitev! 🌟 Prihodnost gostinstva je TUKAJ!','#AI #inovacije #hotelirstvo #digitalnatransformacija #budučnost #gamechanger'],
+    gnd:['V 14 dneh pilota je imel hotel s 24 sobami <span class="hl">38 % manj neodgovorjenih povpraševanj</span>. Nič novih zaposlitev; samo recepcija, ki odgovori tudi ob 23h.','Pišem <span class="hl">direktorjem butičnih hotelov</span>: če vam povpraševanja uhajajo ponoči, mi pošljite sporočilo in pokažem, kako je videti na vaših mailih.']},
+   {prompt:'Pripravi ponudbo za stranko z včerajšnjega klica.',good:'pripravljeno za pošiljanje',
+    files:[['zapiski.md','Penzion Pri Lipi: 18 sob, izgubljajo telefonske rezervacije, odločata brata'],['cenik.md','postavitev 1.500 €, mesečno 190 €, ob letnem plačilu 10 % manj'],['pogoji.md','14-dnevni preizkus v živo, račun šele po uspešnem testu']],
+    gen:['Spoštovani, v priponki vam pošiljamo ponudbo za naše inovativne rešitve.','Cene so po dogovoru in se prilagodijo vašim edinstvenim potrebam. Veselimo se sodelovanja!'],
+    gnd:['Ponudba za Penzion Pri Lipi: rezervacijski sistem, postavitev <span class="hl">1.500 €</span> in <span class="hl">190 € na mesec</span> (ob letnem plačilu 10 % manj).','Začnemo s <span class="hl">14-dnevnim preizkusom v živo</span> na vaših telefonskih povpraševanjih; račun izstavimo šele, ko test uspe. PDF na dveh straneh, pripravljen za oba odločevalca.']}
+  ];
+  function ctxEx(i,btn){[...document.querySelectorAll('.ctab')].forEach(b=>b.classList.toggle('on',b===btn));const e=ctxExs[i];
+    document.getElementById('cx-prompt').textContent=e.prompt;
+    document.getElementById('cx-goodstamp').textContent=e.good;
+    document.getElementById('cx-files').innerHTML=e.files.map(f=>'<div class="ctxfile"><b>'+f[0]+'</b> · '+f[1]+'</div>').join('');
+    document.getElementById('cx-gen').innerHTML=e.gen.map(l=>'<p class="line">'+l+'</p>').join('');
+    document.getElementById('cx-gnd').innerHTML=e.gnd.map(l=>'<p class="line">'+l+'</p>').join('');
+  }
+  ctxEx(0,document.querySelector('.ctab'));
+
+  // S8 prazna soba
+  const caps={
+    mail:['<b>prebere</b> in razvrsti predal','pripravi <b>osnutke odgovorov</b>','<span class="cap gate" style="border:0;padding:0"><b>pošlje šele po tvojem kliku</b></span>'],
+    cal:['<b>prebere</b> tvoj teden','predlaga <b>razpored</b>','rezervira <b>po potrditvi</b>'],
+    files:['<b>organizira</b> mape','<b>pretvarja formate</b>','piše in ureja <b>dokumente</b>'],
+    deploy:['<b>objavi stran</b> na strežnik','vrne <b>živ URL</b>','prebere <b>loge</b>, ko kaj šepa']
+  };
+  const granted=new Set();
+  function grant(el,key){
+    el.classList.toggle('onn');
+    const room=document.getElementById('room');
+    if(granted.has(key)){granted.delete(key);[...room.querySelectorAll('[data-k="'+key+'"]')].forEach(n=>n.remove());}
+    else{granted.add(key);caps[key].forEach((c,i)=>{const s=document.createElement('span');s.className='cap';s.dataset.k=key;s.style.animationDelay=(i*.12)+'s';s.innerHTML=c;room.appendChild(s)});}
+    document.getElementById('roomempty').style.display=granted.size?'none':'flex';
+  }
+
+  // S9 miza
+  const junk=['str. 1–8: pregled trga','str. 9–17: konkurenčne tabele','str. 18–26: metodologija','str. 27–33: priloga A','str. 34–40: surovi podatki','naključna debata','stara veriga mailov'];
+  let junkIdx=0;
+  function setMeter(v){const f=document.getElementById('fill'),p=document.getElementById('pct'),m=document.getElementById('meter');f.style.width=v+'%';p.textContent=v+'%';m.classList.toggle('low',v<60)}
+  function addWork(){const d=document.getElementById('desk');for(let k=0;k<3&&junkIdx<junk.length;k++){const s=document.createElement('span');s.className='paper junk';s.textContent=junk[junkIdx++];d.appendChild(s)}setMeter(Math.max(38,96-junkIdx*9))}
+  function delegate(){const d=document.getElementById('desk'),sd=document.getElementById('sidedesk');const els=[...d.querySelectorAll('.junk')];if(!els.length)return;els.forEach(e=>{e.classList.remove('junk');sd.appendChild(e)});setTimeout(()=>{sd.innerHTML='';const sum=document.createElement('span');sum.className='paper summary';sum.textContent='✓ povzetek na eni strani: 5 stvari, ki štejejo';d.appendChild(sum);setMeter(95)},900);junkIdx=0}
+  function resetDesk(){document.getElementById('desk').innerHTML='<span class="paper core">tvoja naloga: napiši ponudbo</span><span class="paper core">CLAUDE.md</span>';document.getElementById('sidedesk').innerHTML='';junkIdx=0;setMeter(96)}
+
+  // S12 spletna aplikacija
+  const appSteps=[
+    {l:0,t:'1/6 · Uporabnik na strani klikne »Rezerviraj termin«. Zanj je to en klik; poglejmo, kaj sproži.'},
+    {l:1,t:'2/6 · Frontend (to, kar vidi) pobere podatke iz obrazca in jih pošlje naprej. Sam ne odloča ničesar.'},
+    {l:2,t:'3/6 · Backend preveri: je termin sploh prost? je uporabnik prijavljen? Logika in pravila živijo tukaj.'},
+    {l:3,t:'4/6 · Baza podatkov zapiše rezervacijo. To je spomin: podatek obstane, tudi ko uporabnik zapre stran.'},
+    {l:2,t:'5/6 · Backend po zapisu še ukrepa: prek servisa pošlje potrditveni mail (o servisih na naslednjem slajdu).'},
+    {l:1,t:'6/6 · Frontend pokaže »Rezervirano ✓«. Cela pot traja manj kot sekundo. In Claude Code zna napisati vsakega od teh slojev.'}
+  ];
+  let appIdx=-1;
+  function appView(i){[...document.querySelectorAll('.av')].forEach((el,j)=>el.classList.toggle('on',j===i))}
+  function appStep(){appIdx=(appIdx+1)%appSteps.length;const s=appSteps[appIdx];[...document.querySelectorAll('#appstack .layer')].forEach(el=>el.classList.toggle('hot',+el.dataset.l===s.l));document.getElementById('appexpl').textContent=s.t;document.getElementById('appbtn').textContent=appIdx===appSteps.length-1?'▶ še enkrat':'▶ naslednji korak';appView(appIdx)}
+  function appReset(){appIdx=-1;[...document.querySelectorAll('#appstack .layer')].forEach(el=>el.classList.remove('hot'));document.getElementById('appexpl').textContent='Pritisni gumb in poglej, kaj se v resnici zgodi ob enem kliku.';document.getElementById('appbtn').textContent='▶ pošlji zahtevo';appView(0)}
+
+  // S14 metoda
+  const stages=[
+    {n:'ukradi',t:'Ukradi kot profesionalec',c:null,d:'Tvoj Claude s Playwrightom odpre terafab.ai, posname screenshote vseh sekcij (namizje in telefon) in pregleda HTML: struktura, hierarhija, ritem. Hkrati se sprehodi skozi TO prezentacijo na spletu in iz nje izlušči NativeAI kontekst, ton in design.',h:null},
+    {n:'zaslišanje',t:'Pusti se zaslišati',c:'/grill-me',d:'Preden gradi, te vpraša, česar iz virov ne more razbrati: komu je stran namenjena, kateri CTA šteje, kaj s terafaba obdržati in kaj opustiti. Predpostavke so način, kako projekti umrejo.',h:'TI odgovarjaš na vprašanja'},
+    {n:'plan na boardu',t:'Planiraj vizualno',c:'/visual-plan',d:'Predlagana struktura strani (hero, kako deluje, dokazi, CTA) se izriše kot interaktiven board. Nič se ne gradi, dokler board ni potrjen.',h:'TI klikneš potrdi'},
+    {n:'prototip',t:'Prototip pred gradnjo',c:null,d:'HTML koncept strani z resnično NativeAI vsebino iz prezentacije, v limeti in Space Grotesku. Reagiraš na ekran, AI iterira, ti zakleneš dizajn. Zaklenjeno je zavezujoče.',h:'TI zakleneš dizajn'},
+    {n:'build',t:'Šele zdaj: gradnja',c:null,d:'Ena sama HTML datoteka: struktura in kvaliteta po zgledu terafaba, vsebina in barve 100 % NativeAI. Brez lorem ipsuma, brez mrtvih gumbov.',h:null},
+    {n:'preveri',t:'Preveri, preden rečeš končano',c:null,d:'Claude s Playwrightom posname SVOJO stran na 1440 in 390 px, jo primerja z zaklenjenim dizajnom in terafab strukturo ter popravi, kar štrli. »Orodje je javilo uspeh« ni končano; pogledati output je končano.',h:null},
+    {n:'ship',t:'Ship',c:null,d:'Commit, push, Dokploy objavi; landing pristane na živem URL-ju in link gre v Discord. Delo se konča kot URL, ne kot datoteka na laptopu.',h:null},
+    {n:'recap',t:'Recap in zapri',c:'/visual-recap',d:'Pregled narejenega, task zaprt v NativeAI OS. Amadej pregleda rezultat: če stran diha NativeAI in teče kot terafab, sta razumela cel kurz.',h:'TI pregledaš recap z Amadejem'}
+  ];
+  let stageIdx=0;
+  const pipe=document.getElementById('pipe');
+  stages.forEach((s,i)=>{const n=document.createElement('span');n.className='pnode';n.textContent=(i+1)+' · '+s.n;n.onclick=()=>{stageIdx=i;renderStage()};pipe.appendChild(n)});
+  function renderStage(){[...pipe.children].forEach((n,i)=>{n.classList.toggle('now',i===stageIdx);n.classList.toggle('done',i<stageIdx)});const s=stages[stageIdx];document.getElementById('stagecard').innerHTML='<h3>'+s.t+'</h3>'+(s.c?'<span class="cmd">'+s.c+'</span><br>':'')+'<p>'+s.d+'</p>'+(s.h?'<div class="human">◉ '+s.h+'</div>':'')}
+  function nextStage(){stageIdx=(stageIdx+1)%stages.length;renderStage()}
+  renderStage();setMeter(96);
+</script>
+</body>
+</html>
