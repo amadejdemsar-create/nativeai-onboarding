@@ -147,15 +147,25 @@ nimaš (token, URL, ključ), se ustavi in mi povej, koga naj vprašam.
      (URL in ključ dobim od Amadeja; dokler ju nimam, ta korak preskoči in zabeleži)
    Twenty CRM in ostalo dodava kasneje, ko bo delo to zahtevalo.
 
-4. RESTART: opozori me, da moram Claude Code po dodajanju MCP-jev
+4. TEAM DOCS (Outline): najin wiki je docs.nativeai.agency in moj račun
+   že obstaja. Reci mi, naj se v brskalniku prijavim s svojim gmailom
+   (magic link) in v Settings → API tokens ustvarim nov token ter ti ga
+   prilepim. Token shrani v ~/.claude/.outline-api-key (chmod 600) in v
+   CLAUDE.md pod My tools dodaj: bazni URL https://docs.nativeai.agency/api,
+   auth Bearer iz te datoteke, vsi endpointi so POST z JSON
+   (documents.search, documents.info, documents.create, documents.update),
+   besedilo je markdown, pri urejanju privzeto append. Preveri delovanje
+   z documents.search za "plan".
+
+5. RESTART: opozori me, da moram Claude Code po dodajanju MCP-jev
    ponovno zagnati, da se priklopi primejo.
 
-5. POROČILO: na koncu mi izpiši tabelo: priklop | status (deluje /
+6. POROČILO: na koncu mi izpiši tabelo: priklop | status (deluje /
    čaka na token / preskočeno) | kaj mi omogoča. Plus seznam stvari,
    ki jih moram še sam urediti (tokeni, Discord).
 
 Ko je vse zeleno, mi predlagaj, da začneva z vajo 1 iz onboarding guida.</pre>
-      <p class="muted" style="margin-top:10px"><b style="color:var(--text)">Amadej pripravi vnaprej:</b> osebni NativeAI OS token za vsakega, Dokploy URL + API ključ (skupni projekt), Discord invite.</p>
+      <p class="muted" style="margin-top:10px"><b style="color:var(--text)">Amadej pripravi vnaprej:</b> osebni NativeAI OS token za vsakega in Dokploy URL + API ključ (skupni projekt). Discord ✓ in Outline računa ✓ že obstajata.</p>
     </div>
   </div>
 </section>
@@ -172,6 +182,13 @@ Ko je vse zeleno, mi predlagaj, da začneva z vajo 1 iz onboarding guida.</pre>
       <p class="muted">Auth: your personal token, ask Amadej. Full setup doc: <code>nativeai-os/docs/os-mcp-setup.md</code>.</p>
       <div class="capability">sees your open tasks at session start, creates tasks for new work, closes them with a note when shipped</div>
       <div class="capability">keeps the whole team's who-does-what honest without meetings</div>
+    </div>
+
+    <div class="card">
+      <h3>Team Docs (Outline) <span class="pill">team wiki</span> <span class="pill lime">day one</span></h3>
+      <p class="muted">Our shared wiki at <b>docs.nativeai.agency</b>: the plan, money model, SOPs, probe status, meeting notes. Your account already exists; log in in the browser with your gmail (magic link). Then create an API token under Settings → API tokens and hand it to your Claude (the master setup prompt below does the wiring: it saves the token to <code>~/.claude/.outline-api-key</code> and teaches your CLAUDE.md the API).</p>
+      <div class="capability">searches and reads team docs so your Claude answers with OUR current plan, not guesses</div>
+      <div class="capability">writes meeting notes and SOPs into the right collection (append-first, revisions keep history)</div>
     </div>
 
     <div class="card">
